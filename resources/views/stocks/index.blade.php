@@ -1,0 +1,371 @@
+@extends('dashboard.master2')
+@section('admin_title', 'Admin | Stocks | ' . (request()->type == 'apple' ? 'Apple Phones' : 'Other Phones'))
+@section('content2')
+
+
+    <div class="container-fluid px-3">
+        <div class="card shadow-sm bg-white rounded-0">
+            <div class="row">
+                <div class="col-lg-3 col-6 col-md-4 col-sm-5">
+                    <a href="{{ route('create.stock', ['type' => request()->type]) }}"
+                        class="btn btn-primary custom-back-button d-flex align-items-center justify-content-center">
+                        <i class="bx bx-plus me-1"></i> Add New Stock
+                    </a>
+                </div>
+                <div class="col-lg-9 col-6 col-md-8 col-sm-7">
+                    <div class="d-flex align-items-center">
+                        <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family: cursive;">
+                            {{ request()->type == 'apple' ? 'Apple Phones' : 'Other Phones' }}
+                        </h3>
+
+                        <h5 class="mt-1 d-block d-lg-none d-md-none" style="font-family: cursive;">
+                            {{ request()->type == 'apple' ? 'Apple Phones' : 'Other Phones' }}
+                        </h5>
+
+                        <div class="ms-4 d-none d-lg-block">
+                            <span id="togglePurchasePriceButton" style="cursor: pointer;color:black">
+                                <i class="bx bx-show"></i> Show Purchase Price
+                            </span>
+                        </div>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                const toggleBtn = document.getElementById('togglePurchasePriceButton');
+                                const priceFields = document.querySelectorAll('.purchase-price');
+
+                                // Load saved preference
+                                let showPrice = localStorage.getItem('showPurchasePrice') === 'true';
+
+                                // Set initial state
+                                updatePriceVisibility(showPrice);
+
+                                // Toggle function
+                                toggleBtn.addEventListener('click', function() {
+                                    showPrice = !showPrice;
+                                    localStorage.setItem('showPurchasePrice', showPrice);
+                                    updatePriceVisibility(showPrice);
+                                });
+
+                                function updatePriceVisibility(show) {
+                                    priceFields.forEach(field => {
+                                        field.style.display = show ? 'table-cell' : 'none';
+                                    });
+                                    toggleBtn.innerHTML = show ?
+                                        '<i class="bx bx-hide"></i> Hide Purchase Price' :
+                                        '<i class="bx bx-show"></i> Show Purchase Price';
+                                }
+                            });
+                        </script>
+
+
+
+
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <style>
+            .custom-back-button {
+                font-size: 16px;
+                height: 100%;
+                width: 100%;
+                border-radius: 0;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .custom-back-button:hover {
+                background-color: #2b2b2b;
+                border: 0px;
+            }
+
+            .custom-back-button i {
+                font-size: 18px;
+            }
+        </style>
+
+
+
+
+        <div class="card mb-2 p-2 mt-2">
+            <form action="" method="GET">
+                <div class="row">
+                    @if (request()->type == 'apple')
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
+                            <select name="model_name" id="" class="form-select" onchange="this.form.submit()">
+                                <option value="{{ null }}">Select Model</option>
+                                @foreach (iphone_models() as $model)
+                                    <option value="{{ $model }}"
+                                        {{ request()->model_name == $model ? 'selected' : '' }}>
+                                        {{ $model }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @else
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
+                            <select name="company_name" id="" class="form-select" onchange="this.form.submit()">
+                                <option value="{{ null }}">Select Company</option>
+                                @foreach (other_companies() as $company)
+                                    <option value="{{ $company }}"
+                                        {{ request()->company_name == $company ? 'selected' : '' }}>
+                                        {{ $company }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
+                        <input type="text" pattern="\d{15}" maxlength="15" required placeholder="IMEI 1" name="imei1"
+                            value="{{ request()->imei1 }}" class="form-control">
+                    </div>
+
+
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
+                        <div class="btn-group w-100">
+                            <a href="{{ route('stock.index', ['type' => request()->type]) }}" title="Clear"
+                                class="btn btn-outline-danger">Clear</a>
+                            <button type="submit" title="Search" class="btn btn-outline-success">Search</button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+
+        @if ($stocks->count() > 0 && (request()->model_name || request()->company_name || request()->imei1))
+            <div class="alert bg-primary text-white mt-3">
+                <strong>{{ $stocks->count() }} {{ $stocks->count() > 0 && $stocks->count() < 2 ? 'Result' : 'Results' }}
+                    Found</strong>
+            </div>
+        @elseif ($stocks->count() < 1 && (request()->model_name || request()->company_name || request()->imei1))
+            <div class="alert bg-warning text-white mt-3">
+                <strong>No Results Found !</strong>
+            </div>
+        @endif
+
+
+        <div class="card p-2 mb-0">
+            @if ($stocks->count() > 0)
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr class="text-center">
+                                <th style="font-size:12px" class="text-dark fw-bold">#</th>
+                                @if (request()->type == 'others')
+                                    <th style="font-size:12px" class="text-dark fw-bold">Comapny</th>
+                                @endif
+
+                                <th style="font-size:12px" class="text-dark fw-bold">Model</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Imei's</th>
+                                <th style="font-size:12px;" class="text-dark fw-bold purchase-price">
+                                    Purchase</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Sale</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Entry</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($stocks as $key => $stock)
+                                <tr class="text-center">
+                                    <td class="text-dark">{{ ++$key }}</td>
+                                    @if (request()->type == 'others')
+                                        <td class="text-dark">
+                                            {{ $stock->company_name }}
+                                        </td>
+                                    @endif
+
+                                    <td class="text-dark fw-bold" style="font-size: 16px;">
+                                        {{ $stock->model_name }}
+                                    </td>
+
+                                    <td class="text-dark">{{ $stock->imei1 }}
+                                        @if ($stock->imei2)
+                                            <br>
+                                            {{ $stock->imei2 }}
+                                        @endif
+                                    </td>
+                                    <td class="text-dark purchase-price">
+                                        {{ 'Rs. ' . number_format($stock->purchase) }}
+                                    </td>
+
+
+                                    <td class="text-dark fw-bold" style="font-size: 20px">
+                                        {{ 'Rs.' . number_format($stock->sale) }}</td>
+                                    <td class="text-dark">{{ $stock->created_at->format('d M y') }}</td>
+
+
+
+
+
+                                    <td>
+                                        <div class="dropdown ms-auto">
+                                            <button class="btn btn-dark btn-sm dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby="dropdownMenuButton">
+                                                   <li>
+                                                    <a class="dropdown-item" href="#"
+                                                        onclick="openMarkAsSoldModal({{ $stock->id }}, {{ $stock->sale }})">Mark
+                                                        As Sold</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('stock.edit', ['type' => request()->type, 'id' => $stock->id]) }}">Edit</a>
+                                                </li>
+                                                {{-- <li>
+                                                    <a class="dropdown-item"
+                                                        onclick="confirmDelete('{{ route('stock.delete', ['id' => $stock->id]) }}')">Delete</a>
+                                                </li> --}}
+                                            </ul>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <div class="float-end mt-2">
+                        {{ $stocks->appends(request()->query())->links('pagination::bootstrap-5') }}
+                    </div>
+                </div>
+            @else
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr class="text-center">
+                                <th style="font-size:12px" class="text-dark fw-bold">#</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Comapny</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Model</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Imei's</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Entry</th>
+                                <th style="font-size:12px" class="text-dark fw-bold">Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+                <h4 class="h4 text-center fw-normal text-muted mt-2">No Data Found!</h4>
+            @endif
+        </div>
+
+    </div>
+
+
+
+
+    {{-- <script>
+        // Function to handle delete confirmation
+        function confirmDelete(url) {
+            Swal.fire({
+                title: 'Are you sure you want to delete this Stock?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
+    </script> --}}
+
+
+
+       <!-- Mark As Sold Modal -->
+    <div class="modal fade" id="markAsSoldModal" tabindex="-1" role="dialog" aria-labelledby="markAsSoldModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="markAsSoldModalLabel">Mark As Sold</h5>
+                    <button type="button" class="btn-close" aria-label="Close" onclick="handleModalClose()">
+                    </button>
+                </div>
+                <form id="markAsSoldForm" action="{{ route('stock.markAsSold') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="stock_id" id="stockId">
+
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-6">
+                                <div class="form-group">
+                                    <label for="soldOutPrice" class="fw-bold text-dark mb-1">Sale Price <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" min="1" class="form-control"
+                                        placeholder="Sale Price" id="salePrice" name="sale_price" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-6">
+                                <div class="form-group">
+                                    <label for="soldOutDate" class="fw-bold text-dark mb-1">Sold Out Date <span
+                                            class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="soldOutDate" name="sold_out_date" required>
+<script>
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('soldOutDate').value = today;
+</script>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-6">
+                                <div class="form-group">
+                                    <label for="buyerName" class="fw-bold text-dark mb-1">Buyer Name <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" placeholder="Buyer Name" id="buyerName"
+                                        name="buyer_name" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-6">
+                                <div class="form-group">
+                                    <label for="buyerPhone" class="fw-bold text-dark mb-1">Buyer Phone (optional)</label>
+                                    <input type="text" class="form-control" maxlength="12"
+                                        placeholder="0399-99999999" data-inputmask="'mask': '0399-99999999'"
+                                        id="buyerPhone" name="buyer_phone">
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            onclick="handleModalClose()">Close</button>
+                        <button type="submit" class="btn btn-primary" id="confirmMarkAsSold">Mark As Sold & Generate
+                            Invoice</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function openMarkAsSoldModal(stockId,SalePrice) {
+            $('#stockId').val(stockId);
+             $('#salePrice').val(SalePrice);
+            $('#markAsSoldModal').modal('show');
+        }
+        function handleModalClose() {
+            $('#markAsSoldModal').modal('hide');
+        }
+    </script>
+@endsection
