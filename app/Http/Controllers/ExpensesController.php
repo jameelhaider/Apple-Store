@@ -77,7 +77,7 @@ class ExpensesController extends Controller
             $sales = DB::table('invoices')
                 ->whereYear('created_at', $year)
                 ->whereMonth('created_at', $monthNumber)
-                ->select('invoices.id as id', 'invoices.invoice_id as invoice_id', 'invoices.profit as profit', 'invoices.total_bill as total_bill', 'invoices.status as status')
+                ->select('invoices.id as id', 'invoices.invoice_id as invoice_id', 'invoices.profit as profit', 'invoices.total_bill as total_bill')
                 ->get();
 
             // Only count invoices not returned for total_bill
