@@ -56,6 +56,12 @@ if (!function_exists('iphone_models')) {
 }
 
 
+function numberToWords($number)
+{
+    $f = new \NumberFormatter('en', \NumberFormatter::SPELLOUT);
+    return ucfirst($f->format($number));
+}
+
 if (!function_exists('other_companies')) {
     function other_companies(): array
     {

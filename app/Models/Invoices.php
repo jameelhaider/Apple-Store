@@ -17,5 +17,6 @@ class Invoices extends Model
         'total_bill',
         'invoice_id',
         'stock_id',
+        'backup',
     ];
 }

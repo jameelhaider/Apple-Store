@@ -127,6 +127,29 @@
                     </div>
 
 
+                       <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
+                      <select name="pta_status" class="form-control" onchange="this.form.submit()" id="">
+                        <option value="">PTA Status</option>
+                        <option value="Official Approved" {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>Official Approved</option>
+                        <option value="Not Approved" {{ request()->pta_status == 'Not Approved' ? 'selected' : '' }}>Not Approved</option>
+                        @if (request()->type == 'apple')
+<option value="Not Approved (4 months remaining)" {{ request()->pta_status == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>Not Approved (4 months remaining)</option>
+                        @endif
+
+
+                         @if (request()->type == 'others')
+                                <option value="Patch Approved"
+                                    {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>Patch
+                                    Approved</option>
+                                <option value="CPID Approved"
+                                    {{ request()->pta_status == 'CPID Approved' ? 'selected' : '' }}>CPID
+                                    Approved</option>
+                            @endif
+
+                      </select>
+                    </div>
+
+
                     <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
                         <div class="btn-group w-100">
                             <a href="{{ route('stock.index', ['type' => request()->type]) }}" title="Clear"
@@ -141,12 +164,12 @@
         </div>
 
 
-        @if ($stocks->count() > 0 && (request()->model_name || request()->company_name || request()->imei1))
+        @if ($stocks->count() > 0 && (request()->model_name || request()->company_name || request()->imei1 || request()->pta_status))
             <div class="alert bg-primary text-white mt-3">
                 <strong>{{ $stocks->count() }} {{ $stocks->count() > 0 && $stocks->count() < 2 ? 'Result' : 'Results' }}
                     Found</strong>
             </div>
-        @elseif ($stocks->count() < 1 && (request()->model_name || request()->company_name || request()->imei1))
+        @elseif ($stocks->count() < 1 && (request()->model_name || request()->company_name || request()->imei1 || request()->pta_status))
             <div class="alert bg-warning text-white mt-3">
                 <strong>No Results Found !</strong>
             </div>
@@ -214,10 +237,14 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end"
                                                 aria-labelledby="dropdownMenuButton">
-                                                   <li>
+                                                <li>
                                                     <a class="dropdown-item" href="#"
                                                         onclick="openMarkAsSoldModal({{ $stock->id }}, {{ $stock->sale }})">Mark
                                                         As Sold</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('stock.view', ['id' => $stock->id]) }}">View Details</a>
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item"
@@ -286,7 +313,7 @@
 
 
 
-       <!-- Mark As Sold Modal -->
+    <!-- Mark As Sold Modal -->
     <div class="modal fade" id="markAsSoldModal" tabindex="-1" role="dialog" aria-labelledby="markAsSoldModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -306,19 +333,20 @@
                                 <div class="form-group">
                                     <label for="soldOutPrice" class="fw-bold text-dark mb-1">Sale Price <span
                                             class="text-danger">*</span></label>
-                                    <input type="number" min="1" class="form-control"
-                                        placeholder="Sale Price" id="salePrice" name="sale_price" required>
+                                    <input type="number" min="1" class="form-control" placeholder="Sale Price"
+                                        id="salePrice" name="sale_price" required>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-6">
                                 <div class="form-group">
                                     <label for="soldOutDate" class="fw-bold text-dark mb-1">Sold Out Date <span
                                             class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="soldOutDate" name="sold_out_date" required>
-<script>
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('soldOutDate').value = today;
-</script>
+                                    <input type="date" class="form-control" id="soldOutDate" name="sold_out_date"
+                                        required>
+                                    <script>
+                                        const today = new Date().toISOString().split('T')[0];
+                                        document.getElementById('soldOutDate').value = today;
+                                    </script>
 
                                 </div>
                             </div>
@@ -343,7 +371,23 @@
                             </div>
                         </div>
 
-                        
+
+
+                        <div class="row mt-2">
+                            <div class="col-lg-12 col-12">
+                                <div class="form-group">
+                                    <label for="buyerName" class="fw-bold text-dark mb-1">Backup Days <span
+                                            class="text-danger">*</span></label>
+                                 <select name="backup" required class="form-select" id="">
+                                    <option value="7 Days">7 Days</option>
+                                    <option value="10 Days">10 Days</option>
+                                    <option value="14 Days">14 Days</option>
+                                 </select>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"
@@ -359,11 +403,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        function openMarkAsSoldModal(stockId,SalePrice) {
+        function openMarkAsSoldModal(stockId, SalePrice) {
             $('#stockId').val(stockId);
-             $('#salePrice').val(SalePrice);
+            $('#salePrice').val(SalePrice);
             $('#markAsSoldModal').modal('show');
         }
+
         function handleModalClose() {
             $('#markAsSoldModal').modal('hide');
         }

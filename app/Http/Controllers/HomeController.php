@@ -70,4 +70,36 @@ class HomeController extends Controller
         }
     }
 
+
+
+    public function checkmodel(Request $request)
+    {
+        if (Gate::allows('is_admin')) {
+            $response = null;
+            if ($request->imei) {
+                $myCheck["service"] = 0;
+                $myCheck["imei"] = $request->imei;
+                $myCheck["key"] = "P1E-Q49-HCL-L4B-A7I-VYC-LDA-U8O";
+                $ch = curl_init("https://api.ifreeicloud.co.uk");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $myCheck);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+                $myResult = json_decode(curl_exec($ch));
+                $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($httpcode != 200) {
+                    return redirect()->back()->with('error', $httpcode);
+                } elseif ($myResult->success !== true) {
+                    return redirect()->back()->with('error', $myResult->error);
+                } else {
+                    $response = $myResult->response;
+                }
+            }
+        } else {
+            return abort(401);
+        }
+
+        return view('checkmodel', ['response' => $response]);
+    }
 }

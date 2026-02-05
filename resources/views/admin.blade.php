@@ -33,7 +33,7 @@
             padding: 20px;
             font-weight: 900;
             color: #000000;
-            background: #d6e3f3;
+            background: #d7d6d6;
         }
 
         .card-icon {
@@ -41,13 +41,12 @@
             margin-right: 10px;
         }
     </style>
-
     <style>
         .chart-container {
             position: relative;
             height: 300px;
             width: 100%;
-            background: linear-gradient(135deg, rgba(106, 102, 102, 0.16), white)
+            background: #d7d6d6;
         }
 
         .chart-container canvas {
@@ -57,5 +56,493 @@
     </style>
 
     <div class="container-fluid px-3">
+
+
+
+        <div class="row mb-1">
+            <div class="col-lg-4 col-md-6 col-12 col-sm-6 mb-4">
+                <h4 class="text-center text-dark fw-bold">Revenue Chart</h4>
+                <div class="card p-2 chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-12 col-12 col-sm-12 mb-4">
+                <h4 class="text-center fw-bold text-dark">Expenses vs Revenue (This Month)</h4>
+                <div class="card p-2 chart-container">
+                    <canvas id="expensesRevenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-12 col-12 col-sm-12 mb-4">
+                <h4 class="text-center fw-bold text-dark">Revenue (Current vs Previous) Month</h4>
+                <div class="card p-2 chart-container">
+                    <canvas id="monthlyRevenueComparisonChart"></canvas>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <h2 class="fw-bold text-center text-dark">Total Rass</h2>
+
+        <div class="row justify-content-around">
+            <div class="col-lg-12 col-12 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <div>
+                            <i class="card-icon bx bx-wallet"></i> Total Rass
+                        </div>
+
+                        <!-- Toggle Switch -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="toggleRass">
+                            <label class="form-check-label" for="toggleRass">Show Rass</label>
+                        </div>
+                    </div>
+
+                    <div class="card-body text-center count-animation text-primary" id="rassValue">
+                        RS.****
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Modal -->
+        <div class="modal fade" id="passwordModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="password" autocomplete="new-password" id="confirmPassword" class="form-control"
+                            placeholder="Enter password">
+                        <small id="errorMsg" class="text-danger mt-2 d-none">Incorrect password!</small>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="submitPassword">Confirm</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            let realValue = "{{ $totalrass }}";
+
+            function formatNumber(num) {
+                return new Intl.NumberFormat().format(num);
+            }
+
+            document.getElementById("toggleRass").addEventListener("change", function() {
+                if (this.checked) {
+                    let modal = new bootstrap.Modal(document.getElementById('passwordModal'));
+                    modal.show();
+                } else {
+                    document.getElementById("rassValue").innerText = "RS.****";
+                }
+            });
+
+            document.getElementById("submitPassword").addEventListener("click", function() {
+                let pass = document.getElementById("confirmPassword").value;
+
+                if (pass === "2cbc0") {
+                    document.getElementById("rassValue").innerText = "RS." + formatNumber(realValue);
+                    document.getElementById("errorMsg").classList.add("d-none");
+                    bootstrap.Modal.getInstance(document.getElementById('passwordModal')).hide();
+                } else {
+                    document.getElementById("errorMsg").classList.remove("d-none");
+                    document.getElementById("toggleRass").checked = false;
+                    document.getElementById("rassValue").innerText = "RS.****";
+                }
+            });
+        </script>
+
+
+
+
+
+
+
+
+
+        <h2 class="fw-bold text-center text-dark">This Month Stats</h2>
+        <div class="row justify-content-around">
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Month Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $thisMonthRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Month Expenses
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totalExpensesthismonth }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Month Profit
+                    </div>
+                    <div class="card-body text-center count-animation"
+                        data-count="{{ $totalProfitthismonthAfterExpenses }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <h2 class="fw-bold text-center text-dark">Sales</h2>
+        <div class="row justify-content-around">
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        Today Sales
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totaltodaysales }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Week Sales
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totalthisweeksales }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Month Sales
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totalthismonthsales }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        Previous Month Sales
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totalprevmonthsales }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Year Sales
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totalthisyearsales }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        OverAll Sales
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $totaloverallsales }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
+
+        <h2 class="fw-bold text-center text-dark">Revenues</h2>
+        <div class="row justify-content-around">
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        Today Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $todayRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Week Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $thisWeekRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Month Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $thisMonthRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        Previous Month Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $previousMonthRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        This Year Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $thisYearRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        OverAll Revenue
+                    </div>
+                    <div class="card-body text-center count-animation" data-count="{{ $overallRevenue }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+
+
     </div>
+
+
+    <script>
+        $(document).ready(function() {
+            // Initialize counter-up
+            $('.count-animation').each(function() {
+                var $this = $(this),
+                    countTo = $this.attr('data-count');
+
+                $this.prop('Counter', 0).animate({
+                    Counter: countTo
+                }, {
+                    duration: 2000, // Duration of the animation in milliseconds
+                    easing: 'swing', // Easing function
+                    step: function(now) {
+                        $this.text('RS.' + Math.ceil(now).toLocaleString());
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize counter-up
+            $('.count-animation-2').each(function() {
+                var $this = $(this),
+                    countTo = $this.attr('data-count');
+
+                $this.prop('Counter', 0).animate({
+                    Counter: countTo
+                }, {
+                    duration: 2000, // Duration of the animation in milliseconds
+                    easing: 'swing', // Easing function
+                    step: function(now) {
+                        $this.text(+Math.ceil(now).toLocaleString());
+                    }
+                });
+            });
+        });
+    </script>
+
+
+
+
+    <!-- Include Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Common Chart Options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: false,
+                }
+            }
+        };
+
+        // Revenue Comparison Chart
+        const revenueChartCtx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(revenueChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Today', 'This Week', 'This Month', 'This Year', 'Overall'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [{{ $todayRevenue }}, {{ $thisWeekRevenue }},
+                        {{ $thisMonthRevenue }},
+                        {{ $thisYearRevenue }}, {{ $overallRevenue }}
+                    ],
+                    backgroundColor: ['#4BC0C0', '#FFCE56', '#FF6384', '#36A2EB', '#9966FF']
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rs.' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+        // Expenses vs Revenue (This Month)
+        const expensesRevenueChartCtx = document.getElementById('expensesRevenueChart').getContext('2d');
+        const expensesRevenueChart = new Chart(expensesRevenueChartCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Expenses', 'Sales Revenue'],
+                datasets: [{
+                    label: 'This Month',
+                    data: [{{ $totalExpensesthismonth }}, {{ $thisMonthRevenue }}],
+                    backgroundColor: ['#FF6384', '#36A2EB']
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Monthly Revenue Comparison (Current and Previous Month)
+        const monthlyRevenueComparisonChartCtx = document.getElementById('monthlyRevenueComparisonChart').getContext('2d');
+        const monthlyRevenueComparisonChart = new Chart(monthlyRevenueComparisonChartCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Previous Month', 'Current Month'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [{{ $previousMonthRevenue }}, {{ $thisMonthRevenue }}],
+                    backgroundColor: ['#36A2EB', '#FF6384']
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rs.' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+
+
 @endsection

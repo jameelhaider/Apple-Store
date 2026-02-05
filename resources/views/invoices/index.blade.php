@@ -16,6 +16,43 @@
                         <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family: cursive;">Invoices</h3>
                         <h5 class="mt-1 d-block d-sm-block d-lg-none d-md-none" style="font-family: cursive;">Invoices</h5>
 
+                         <div class="ms-4 d-none d-lg-block">
+                            <span id="togglePurchasePriceButton" style="cursor: pointer;color:black">
+                                <i class="bx bx-show"></i> Show Profit
+                            </span>
+                        </div>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                const toggleBtn = document.getElementById('togglePurchasePriceButton');
+                                const priceFields = document.querySelectorAll('.purchase-price');
+
+                                // Load saved preference
+                                let showPrice = localStorage.getItem('showPurchasePrice') === 'true';
+
+                                // Set initial state
+                                updatePriceVisibility(showPrice);
+
+                                // Toggle function
+                                toggleBtn.addEventListener('click', function() {
+                                    showPrice = !showPrice;
+                                    localStorage.setItem('showPurchasePrice', showPrice);
+                                    updatePriceVisibility(showPrice);
+                                });
+
+                                function updatePriceVisibility(show) {
+                                    priceFields.forEach(field => {
+                                        field.style.display = show ? 'table-cell' : 'none';
+                                    });
+                                    toggleBtn.innerHTML = show ?
+                                        '<i class="bx bx-hide"></i> Hide Profit' :
+                                        '<i class="bx bx-show"></i> Show Profit';
+                                }
+                            });
+                        </script>
+
+
+
                     </div>
                 </div>
             </div>
@@ -31,6 +68,7 @@
                 transition: all 0.3s ease;
                 font-weight: 500;
             }
+
             .custom-back-button i {
                 font-size: 18px;
             }
@@ -39,7 +77,7 @@
 
 
 
-        <div class="card mb-2 p-2 mt-2" >
+        <div class="card mb-2 p-2 mt-2">
             <form action="" method="GET">
                 <div class="row">
                     <div class="col-lg-5 col-md-4 col-sm-4 col-6 mt-1 mb-1">
@@ -84,7 +122,7 @@
         @endif
 
 
-        <div class="card p-2 mb-0" >
+        <div class="card p-2 mb-0">
             @if ($invoices->count() > 0)
                 <div class="table-responsive">
                     <table class="table">
@@ -94,7 +132,7 @@
                                 <th style="font-size:14px" class="text-dark fw-bold">Invoice Id</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Company</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Model</th>
-                                <th style="font-size:14px" class="text-dark fw-bold">Profit</th>
+                                <th style="font-size:14px" class="text-dark fw-bold purchase-price">Profit</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Sale</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Sold To</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Date</th>
@@ -106,7 +144,7 @@
                                 <tr class="text-center">
                                     <td class="text-dark">{{ ++$key }}</td>
                                     <td>
-                                        <a class="nav-link text-dark" href="">
+                                        <a class="nav-link text-dark fw-bold" href="">
                                             {{ $invoice->invoice_id }}
                                         </a>
                                     </td>
@@ -114,33 +152,34 @@
                                             {{ $invoice->company_name ? $invoice->company_name : '----------' }}
                                         </a>
                                     </td>
-                                    <td>
+                                    <td class="fw-bold">
                                         <a class="nav-link text-dark" href="">
                                             {{ $invoice->model_name ? $invoice->model_name : '----------' }}
                                         </a>
                                     </td>
-                                     <td class="text-dark">
-                                            {{'Rs.'. number_format($invoice->profit) }}
+                                    <td class="text-dark purchase-price">
+                                        {{ 'Rs.' . number_format($invoice->profit) }}
                                     </td>
-                                        <td class="text-dark">
-                                            {{'Rs.'. number_format($invoice->total_bill) }}
+                                    <td class="text-dark fw-bold" style="font-size: 17px">
+                                        {{ 'Rs.' . number_format($invoice->total_bill) }}
                                     </td>
-                                       <td class="text-dark">
-                                            {{$invoice->buyer_name}}
-                                            @if ($invoice->buyer_phone)
+                                    <td class="text-dark">
+                                        {{ $invoice->buyer_name }}
+                                        @if ($invoice->buyer_phone)
                                             <br>
-                                            {{$invoice->buyer_phone}}
-                                            @endif
+                                            {{ $invoice->buyer_phone }}
+                                        @endif
                                     </td>
 
-                                   <td class="text-dark" title="{{ \Carbon\Carbon::parse($invoice->sold_date)->format('d M y') }}">
-    {{ \Carbon\Carbon::parse($invoice->sold_date)->format('d M y') }}
-</td>
+                                    <td class="text-dark"
+                                        title="{{ \Carbon\Carbon::parse($invoice->sold_date)->format('d M y') }}">
+                                        {{ \Carbon\Carbon::parse($invoice->sold_date)->format('d M y') }}
+                                    </td>
 
 
                                     <td>
-                                            <a href=""
-                                                class="btn btn-primary btn-sm" title="View Invoice"> View Invoice <i class="bx bx-show"></i></a>
+                                        <a href="{{ route('invoice.view',['id'=>$invoice->id]) }}" class="btn btn-primary btn-sm" title="View Invoice"> View Invoice
+                                            <i class="bx bx-show"></i></a>
 
                                     </td>
                                 </tr>

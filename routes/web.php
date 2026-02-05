@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\StocksController;
-use App\Http\Controllers\DemandsController;
-use App\Http\Controllers\AccountsController;
-use App\Http\Controllers\CashReceivedController;
 use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\CloseMonthController;
@@ -135,6 +132,8 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+
+
     Route::group(['prefix' => 'admin'], function () {
         Route::get('/change-password', [HomeController::class, 'changepassword'])->name("change.password");
         Route::post('/update-password', [HomeController::class, 'updatepassword'])->name("update.password");
@@ -142,19 +141,95 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/', function () {
             if (Gate::allows('is_admin')) {
-                return view('admin');
+                // Revenues
+                $today = Carbon::today();
+                $startOfWeek = Carbon::now()->startOfWeek();
+                $startOfMonth = Carbon::now()->startOfMonth();
+                $endOfMonth = Carbon::now()->endOfMonth();
+                $endOfWeek = Carbon::now()->endOfWeek();
+                $startOfYear = Carbon::now()->startOfYear();
+                $endOfYear = Carbon::now()->endOfYear();
+                $startOfPreviousMonth = Carbon::now()->subMonth()->startOfMonth();
+                $endOfPreviousMonth = Carbon::now()->subMonth()->endOfMonth();
+                $todayRevenue = DB::table('invoices')
+                    ->whereDate('sold_date', $today)
+                    ->sum('profit');
+                $thisWeekRevenue = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfWeek, $endOfWeek])
+                    ->sum('profit');
+                $thisMonthRevenue = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfMonth, $endOfMonth])
+                    ->sum('profit');
+                $thisYearRevenue = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfYear, $endOfYear])
+                    ->sum('profit');
+                $overallRevenue = DB::table('invoices')
+                    ->sum('profit');
+                $previousMonthRevenue = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfPreviousMonth, $endOfPreviousMonth])
+                    ->sum('profit');
+                $totalExpensesthismonth = DB::table('expenses')
+                    ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                    ->sum('ammount');
+                $totalProfitthismonthAfterExpenses = $thisMonthRevenue - $totalExpensesthismonth;
+
+                $totalrass = DB::table('stocks')
+                    ->where('status', 'Available')
+                    ->sum('purchase');
+                $totaltodaysales = DB::table('invoices')
+                    ->whereDate('sold_date', $today)
+                    ->sum('total_bill');
+                $totalthisweeksales = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfWeek, $endOfWeek])
+                    ->sum('total_bill');
+                $totalthismonthsales = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfMonth, $endOfMonth])
+                    ->sum('total_bill');
+                $totalprevmonthsales = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfPreviousMonth, $endOfPreviousMonth])
+                    ->sum('total_bill');
+                $totalthisyearsales = DB::table('invoices')
+                    ->whereBetween('sold_date', [$startOfYear, $endOfYear])
+                    ->sum('total_bill');
+                $totaloverallsales = DB::table('invoices')
+                    ->sum('total_bill');
+                return view('admin', compact(
+                    'todayRevenue',
+                    'thisWeekRevenue',
+                    'thisYearRevenue',
+                    'overallRevenue',
+                    'thisMonthRevenue',
+                    'totalExpensesthismonth',
+                    'previousMonthRevenue',
+                    'totalrass',
+                    'totalProfitthismonthAfterExpenses',
+                    'totaltodaysales',
+                    'totalthisweeksales',
+                    'totalthismonthsales',
+                    'totalprevmonthsales',
+                    'totalthisyearsales',
+                    'totaloverallsales',
+                ));
             } else {
                 return abort(401);
             }
         });
 
 
-    Route::post('/stock/markAsSold', [StocksController::class, 'markassold'])->name('stock.markAsSold');
+        Route::post('/stock/markAsSold', [StocksController::class, 'markassold'])->name('stock.markAsSold');
+
+        //Invoices
+        Route::group(['prefix' => 'invoices'], function () {
+            Route::get('/view/{id}', [InvoicesController::class, 'view'])->name("invoice.view");
+            //index
+            Route::get('/', [InvoicesController::class, 'index'])->name("invoices.index");
+        });
 
 
-    Route::get('/invoices', [InvoicesController::class, 'index'])->name('invoices.index');
-
-
+        Route::group(['prefix' => 'check-model'], function () {
+            //index
+            Route::get('/', [HomeController::class, 'checkmodel'])->name("checkmodel.index");
+        });
 
         //Stocks
         Route::group(['prefix' => 'stocks'], function () {
@@ -162,6 +237,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/submit', [StocksController::class, 'submit'])->name("submit.stock");
             Route::get('/create/{type}', [StocksController::class, 'create'])->name("create.stock");
             Route::get('/edit/{type}/{id}', [StocksController::class, 'edit'])->name("stock.edit");
+            Route::get('/view/{id}', [StocksController::class, 'view'])->name("stock.view");
             Route::post('/update/{id}', [StocksController::class, 'update'])->name("update.stock");
             // Route::get('/delete/{id}', [StocksController::class, 'delete'])->name("stock.delete");
             Route::get('/{type}', [StocksController::class, 'index'])->name("stock.index");
@@ -184,17 +260,10 @@ Route::middleware(['auth'])->group(function () {
         });
 
 
-
-
-
-        Route::get('/sale-history', [AccountsController::class, 'salehistory'])->name("sale.history");
         //profits
         Route::group(['prefix' => 'profit-stats'], function () {
             Route::get('/', [ExpensesController::class, 'stats'])->name("stats.profit");
         });
-
-
-
     });
 });
 

@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Demands;
 use App\Models\Invoices;
 use App\Models\Stocks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\Rule;
 
 class StocksController extends Controller
 {
@@ -17,7 +15,7 @@ class StocksController extends Controller
     {
         if (Gate::allows('is_admin')) {
             $query = Stocks::query()
-                ->select('company_name', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at')
+                ->select('company_name', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at','pta_status')
                 ->where('type', $type)
                 ->where('status', 'Available');
             if ($request->model_name) {
@@ -28,6 +26,10 @@ class StocksController extends Controller
             }
             if ($request->imei1) {
                 $query->where('stocks.imei1', $request->imei1);
+            }
+
+             if ($request->pta_status) {
+                $query->where('stocks.pta_status', $request->pta_status);
             }
             $stocks = $query
                 ->orderBy('created_at', 'desc')
@@ -42,7 +44,6 @@ class StocksController extends Controller
     {
         if (Gate::allows('is_admin')) {
             $stock = DB::table('stocks')
-                ->select('stocks.name as name', 'stocks.id as id')
                 ->where('stocks.id', $id)->first();
             return view('stocks.view', compact('stock'));
         } else {
@@ -219,10 +220,10 @@ class StocksController extends Controller
         'total_bill'   => $request->sale_price,
         'buyer_name'  => $request->buyer_name,
         'buyer_phone' => $request->buyer_phone,
+        'backup' => $request->backup,
     ]);
     $stock->update(['status' => 'Sold Out']);
-
-    return redirect()->back()->with('success', 'Stock marked as sold successfully.');
+    return redirect()->route('invoice.view',['id'=>$invoice->id])->with('success', 'Stock marked as sold successfully.');
 }
 
 }

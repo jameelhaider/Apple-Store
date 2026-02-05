@@ -217,11 +217,11 @@
                                             @foreach ($sales as $key => $sale)
                                                 <tr class="text-center">
                                                     <td class="text-dark">{{ ++$key }}</td>
-                                                    <td><a href=""
+                                                    <td><a href="{{ route('invoice.view',['id'=>$sale->id]) }}"
                                                             class="text-dark">{{ $sale->invoice_id }}</a></td>
                                                     <td class="text-dark">{{ 'Rs.' . number_format($sale->profit) }}</td>
-                                                    <td><a href=""
-                                                            class="btn btn-dark btn-sm" title="View Invoice"> Invoice <i
+                                                    <td><a href="{{ route('invoice.view',['id'=>$sale->id]) }}"
+                                                            class="btn btn-primary btn-sm" title="View Invoice"> Invoice <i
                                                                 class="bx bx-show"></i>
                                                         </a></td>
                                                 </tr>

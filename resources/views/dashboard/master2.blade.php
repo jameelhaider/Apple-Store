@@ -237,6 +237,22 @@
 
 
 
+                  <!-- Device Info -->
+                    <li class="menu-header small text-uppercase text-dark fw-bold"><span class="menu-header-text">Device
+                            Info</span></li>
+                    <li class="menu-item {{ Request::is('admin/check-model') ? 'active' : '' }}">
+                        <a href="{{ url('admin/check-model') }}"
+                            class="menu-link {{ !Request::is('admin/check-model') ? 'text-dark' : '' }}">
+                            <i class="menu-icon tf-icons bx bx-info-circle"></i>
+                            <div data-i18n="Support">Check Device Info</div>
+
+                        </a>
+                    </li>
+
+
+
+
+
 
 
 
@@ -459,9 +475,6 @@
 
                                 <div class="d-none d-lg-block">
                                     <a href="{{ url('/admin') }}" class="footer-link me-4">Dashboard</a>
-
-                                    <a href="{{ url('admin/invoice/make') }}" class="footer-link me-4">Make
-                                        Sale Invoice</a>
                                     <a href="{{ url('admin/invoices') }}" class="footer-link me-4">List Sale
                                         Invoices</a>
 
