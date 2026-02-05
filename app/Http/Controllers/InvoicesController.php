@@ -19,6 +19,7 @@ class InvoicesController extends Controller
                 'invoices.*',
                 'stocks.company_name',
                 'stocks.model_name',
+                'stocks.id as stock_id',
             )
             ->join('stocks', 'stocks.id', '=', 'invoices.stock_id');
         if ($request->filled('invoice_id')) {

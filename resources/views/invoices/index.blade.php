@@ -144,16 +144,16 @@
                                 <tr class="text-center">
                                     <td class="text-dark">{{ ++$key }}</td>
                                     <td>
-                                        <a class="nav-link text-dark fw-bold" href="">
+                                        <a class="nav-link text-dark fw-bold" href="{{ route('invoice.view',['id'=>$invoice->id]) }}">
                                             {{ $invoice->invoice_id }}
                                         </a>
                                     </td>
-                                    <td> <a class="nav-link text-dark" href="">
+                                    <td> <a class="nav-link text-dark" href="{{ route('invoice.view',['id'=>$invoice->id]) }}">
                                             {{ $invoice->company_name ? $invoice->company_name : '----------' }}
                                         </a>
                                     </td>
                                     <td class="fw-bold">
-                                        <a class="nav-link text-dark" href="">
+                                        <a class="nav-link text-dark" href="{{ route('invoice.view',['id'=>$invoice->id]) }}">
                                             {{ $invoice->model_name ? $invoice->model_name : '----------' }}
                                         </a>
                                     </td>
@@ -177,11 +177,36 @@
                                     </td>
 
 
-                                    <td>
-                                        <a href="{{ route('invoice.view',['id'=>$invoice->id]) }}" class="btn btn-primary btn-sm" title="View Invoice"> View Invoice
+                                    {{-- <td>
+                                        <a href="{{ route('invoice.view',['id'=>$invoice->id]) }}" target="_BLANK" class="btn btn-primary btn-sm" title="View Invoice"> View Invoice
                                             <i class="bx bx-show"></i></a>
 
+                                    </td> --}}
+
+                                       <td>
+                                        <div class="dropdown ms-auto">
+                                            <button class="btn btn-dark btn-sm dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end"
+                                                aria-labelledby="dropdownMenuButton">
+                                                <li>
+                                                    <a class="dropdown-item" target="_BLANCK"
+                                                        href="{{ route('invoice.view', ['id' => $invoice->id]) }}">View
+                                                        Invoice</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">Mark
+                                                        As Returned</a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
+
+
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -211,4 +236,23 @@
         </div>
 
     </div>
+
+
+        <script>
+        // Function to handle delete confirmation
+        function confirmDelete(url) {
+            Swal.fire({
+                title: 'Are you sure you want to Mark this Phone As Returned?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Mark it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            })
+        }
+    </script>
 @endsection

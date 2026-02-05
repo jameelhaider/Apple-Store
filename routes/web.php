@@ -217,6 +217,7 @@ Route::middleware(['auth'])->group(function () {
 
 
         Route::post('/stock/markAsSold', [StocksController::class, 'markassold'])->name('stock.markAsSold');
+        Route::get('/stock/returned/{id}/invoice/{invoice_id}', [StocksController::class, 'returned'])->name('stock.returned');
 
         //Invoices
         Route::group(['prefix' => 'invoices'], function () {

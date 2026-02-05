@@ -206,8 +206,11 @@
                                         </td>
                                     @endif
 
-                                    <td class="text-dark fw-bold" style="font-size: 16px;">
-                                        {{ $stock->model_name }}
+                                    <td class="text-dark fw-bold" title="View Details" style="font-size: 16px;">
+                                        <a href="{{ route('stock.view', ['id' => $stock->id]) }}">
+                                            {{ $stock->model_name }}
+                                        </a>
+
                                     </td>
 
                                     <td class="text-dark">{{ $stock->imei1 }}
@@ -221,8 +224,12 @@
                                     </td>
 
 
-                                    <td class="text-dark fw-bold" style="font-size: 20px">
-                                        {{ 'Rs.' . number_format($stock->sale) }}</td>
+                                    <td class="text-dark fw-bold" title="Edit Stock" style="font-size: 20px">
+
+                                        <a href="{{ route('stock.edit', ['type' => request()->type, 'id' => $stock->id]) }}">
+                                             {{ 'Rs.' . number_format($stock->sale) }}
+                                        </a>
+                                    </td>
                                     <td class="text-dark">{{ $stock->created_at->format('d M y') }}</td>
 
 
@@ -379,6 +386,12 @@
                                     <label for="buyerName" class="fw-bold text-dark mb-1">Backup Days <span
                                             class="text-danger">*</span></label>
                                  <select name="backup" required class="form-select" id="">
+                                    <option value="1 Day">1 Day</option>
+                                    <option value="2 Days">2 Days</option>
+                                    <option value="3 Days">3 Days</option>
+                                    <option value="4 Days">4 Days</option>
+                                    <option value="5 Days">5 Days</option>
+                                    <option value="6 Days">6 Days</option>
                                     <option value="7 Days">7 Days</option>
                                     <option value="10 Days">10 Days</option>
                                     <option value="14 Days">14 Days</option>

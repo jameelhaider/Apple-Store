@@ -15,7 +15,7 @@ class StocksController extends Controller
     {
         if (Gate::allows('is_admin')) {
             $query = Stocks::query()
-                ->select('company_name', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at','pta_status')
+                ->select('company_name', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at', 'pta_status')
                 ->where('type', $type)
                 ->where('status', 'Available');
             if ($request->model_name) {
@@ -28,7 +28,7 @@ class StocksController extends Controller
                 $query->where('stocks.imei1', $request->imei1);
             }
 
-             if ($request->pta_status) {
+            if ($request->pta_status) {
                 $query->where('stocks.pta_status', $request->pta_status);
             }
             $stocks = $query
@@ -198,32 +198,47 @@ class StocksController extends Controller
     // }
 
 
-  public function markassold(Request $request)
-{
-    if (!Gate::allows('is_admin')) {
-        abort(401, 'Unauthorized action.');
+    public function markassold(Request $request)
+    {
+        if (!Gate::allows('is_admin')) {
+            abort(401, 'Unauthorized action.');
+        }
+        $request->validate([
+            'stock_id' => 'required|exists:stocks,id',
+            'sold_out_date' => 'required|date',
+            'buyer_name' => 'required|string|max:255',
+            'buyer_phone' => 'nullable|string|max:20',
+            'sale_price' => 'required|numeric|min:0',
+        ]);
+        $stock = Stocks::findOrFail($request->stock_id);
+        $profit = $request->sale_price - $stock->purchase;
+        $invoice = Invoices::create([
+            'invoice_id'  => 'AS' . rand(1000, 9999),
+            'stock_id'    => $stock->id,
+            'profit'      => $profit,
+            'sold_date'   => $request->sold_out_date,
+            'total_bill'   => $request->sale_price,
+            'buyer_name'  => $request->buyer_name,
+            'buyer_phone' => $request->buyer_phone,
+            'backup' => $request->backup,
+        ]);
+        $stock->update(['status' => 'Sold Out']);
+        return redirect()->route('invoice.view', ['id' => $invoice->id])->with('success', 'Stock marked as sold successfully.');
     }
-    $request->validate([
-        'stock_id' => 'required|exists:stocks,id',
-        'sold_out_date' => 'required|date',
-        'buyer_name' => 'required|string|max:255',
-        'buyer_phone' => 'nullable|string|max:20',
-        'sale_price' => 'required|numeric|min:0',
-    ]);
-    $stock = Stocks::findOrFail($request->stock_id);
-    $profit = $request->sale_price - $stock->purchase;
-    $invoice = Invoices::create([
-        'invoice_id'  => 'AS' . rand(1000, 9999),
-        'stock_id'    => $stock->id,
-        'profit'      => $profit,
-        'sold_date'   => $request->sold_out_date,
-        'total_bill'   => $request->sale_price,
-        'buyer_name'  => $request->buyer_name,
-        'buyer_phone' => $request->buyer_phone,
-        'backup' => $request->backup,
-    ]);
-    $stock->update(['status' => 'Sold Out']);
-    return redirect()->route('invoice.view',['id'=>$invoice->id])->with('success', 'Stock marked as sold successfully.');
-}
 
+
+
+    public function returned($id, $invoice_id)
+    {
+        if (Gate::allows('is_admin')) {
+            $invoice = Invoices::find($invoice_id);
+            $invoice->delete();
+            $stock = Stocks::find($id);
+            $stock->status = 'Available';
+            $stock->save();
+            return redirect()->back()->with('success', 'Stock marked as returned successfully.');
+        } else {
+            return abort(401);
+        }
+    }
 }
