@@ -69,7 +69,7 @@ Route::get('/send-database-backup', function () {
         }
         $sql .= "\n\n";
     }
-    Mail::to(['jameelhaider047@gmail.com', 'rana.awais.9110@gmail.com'])
+    Mail::to(['jameelhaider047@gmail.com', 'ahmadsajid1447@gmail.com'])
         ->send(new DatabaseBackupMail($sql, $filename));
     return redirect()->back()->with('success', 'Database backup sent to email successfully.');
 })->name('send.database.backup');
