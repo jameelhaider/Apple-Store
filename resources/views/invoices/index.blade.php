@@ -16,7 +16,7 @@
                         <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family: cursive;">Invoices</h3>
                         <h5 class="mt-1 d-block d-sm-block d-lg-none d-md-none" style="font-family: cursive;">Invoices</h5>
 
-                         <div class="ms-4 d-none d-lg-block">
+                        <div class="ms-4 d-none d-lg-block">
                             <span id="togglePurchasePriceButton" style="cursor: pointer;color:black">
                                 <i class="bx bx-show"></i> Show Profit
                             </span>
@@ -122,6 +122,8 @@
         @endif
 
 
+        <label for="" class="text-dark"><strong class="text-danger">Note: </strong>Invoice Can Only Be Returned Within Backup Days of Sold Phone.</label>
+
         <div class="card p-2 mb-0">
             @if ($invoices->count() > 0)
                 <div class="table-responsive">
@@ -144,16 +146,19 @@
                                 <tr class="text-center">
                                     <td class="text-dark">{{ ++$key }}</td>
                                     <td>
-                                        <a class="nav-link text-dark fw-bold" href="{{ route('invoice.view',['id'=>$invoice->id]) }}">
+                                        <a class="nav-link text-dark fw-bold"
+                                            href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
                                             {{ $invoice->invoice_id }}
                                         </a>
                                     </td>
-                                    <td> <a class="nav-link text-dark" href="{{ route('invoice.view',['id'=>$invoice->id]) }}">
+                                    <td> <a class="nav-link text-dark"
+                                            href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
                                             {{ $invoice->company_name ? $invoice->company_name : '----------' }}
                                         </a>
                                     </td>
                                     <td class="fw-bold">
-                                        <a class="nav-link text-dark" href="{{ route('invoice.view',['id'=>$invoice->id]) }}">
+                                        <a class="nav-link text-dark"
+                                            href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
                                             {{ $invoice->model_name ? $invoice->model_name : '----------' }}
                                         </a>
                                     </td>
@@ -183,7 +188,7 @@
 
                                     </td> --}}
 
-                                       <td>
+                                    <td>
                                         <div class="dropdown ms-auto">
                                             <button class="btn btn-dark btn-sm dropdown-toggle" type="button"
                                                 id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -196,11 +201,34 @@
                                                         href="{{ route('invoice.view', ['id' => $invoice->id]) }}">View
                                                         Invoice</a>
                                                 </li>
-                                                <li>
+                                                {{-- <li>
                                                     <a class="dropdown-item"
                                                         onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">Mark
                                                         As Returned</a>
-                                                </li>
+                                                </li> --}}
+
+                                                @php
+    // Extract number from "1 Day", "2 Days"
+    $backupDays = (int) filter_var($invoice->backup, FILTER_SANITIZE_NUMBER_INT);
+
+    // Calculate days passed
+    $daysPassed = \Carbon\Carbon::parse($invoice->sold_date)
+                    ->diffInDays(\Carbon\Carbon::now());
+
+    // Remaining days
+    $remainingDays = $backupDays - $daysPassed;
+@endphp
+
+@if ($remainingDays > 0)
+    <li>
+        <a class="dropdown-item"
+           onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">
+            Mark As Returned
+        </a>
+    </li>
+@endif
+
+
                                             </ul>
                                         </div>
                                     </td>
@@ -238,7 +266,7 @@
     </div>
 
 
-        <script>
+    <script>
         // Function to handle delete confirmation
         function confirmDelete(url) {
             Swal.fire({
