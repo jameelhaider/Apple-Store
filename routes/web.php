@@ -1,19 +1,23 @@
 <?php
 
+use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\CashReceivedController;
+use App\Http\Controllers\CloseMonthController;
+use App\Http\Controllers\ExpensesController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InvoicesController;
+use App\Http\Controllers\StocksController;
+use App\Mail\DatabaseBackupMail;
 use App\Models\CloseMonths;
 use Illuminate\Support\Carbon;
-use App\Mail\DatabaseBackupMail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Response;
-use App\Http\Controllers\StocksController;
-use App\Http\Controllers\ExpensesController;
-use App\Http\Controllers\InvoicesController;
-use App\Http\Controllers\CloseMonthController;
+use Illuminate\Support\Facades\Route;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -193,6 +197,9 @@ Route::middleware(['auth'])->group(function () {
                     ->sum('total_bill');
                 $totaloverallsales = DB::table('invoices')
                     ->sum('total_bill');
+                    $totalrem = DB::table('accounts')
+                    ->where('prev_balance', '>', 0)
+                    ->sum('prev_balance');
                 return view('admin', compact(
                     'todayRevenue',
                     'thisWeekRevenue',
@@ -209,6 +216,7 @@ Route::middleware(['auth'])->group(function () {
                     'totalprevmonthsales',
                     'totalthisyearsales',
                     'totaloverallsales',
+                    'totalrem'
                 ));
             } else {
                 return abort(401);
@@ -244,6 +252,35 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/{type}', [StocksController::class, 'index'])->name("stock.index");
             // view
             Route::get('/{id}/view', [StocksController::class, 'view'])->name("stock.view");
+        });
+
+
+          //accounts
+        Route::group(['prefix' => 'accounts'], function () {
+            //CRUD
+            Route::post('/submit', [AccountsController::class, 'submit'])->name("submit.account");
+            Route::get('/create', [AccountsController::class, 'create'])->name("create.account");
+            Route::get('/edit/{id}', [AccountsController::class, 'edit'])->name("account.edit");
+            Route::post('/update/{id}', [AccountsController::class, 'update'])->name("update.account");
+            //index
+            Route::get('/', [AccountsController::class, 'index'])->name("index.account");
+
+            Route::get('/{id}/ledger', [AccountsController::class, 'ledger'])->name("account.ledger");
+            Route::get('/{id}/details', [AccountsController::class, 'details'])->name("account.details");
+        });
+
+
+           //cash received
+        Route::group(['prefix' => 'cash-received'], function () {
+            //CRUD
+            Route::post('/submit', [CashReceivedController::class, 'submit'])->name("submit.cash");
+            Route::get('/create', [CashReceivedController::class, 'create'])->name("create.cash");
+            Route::get('/edit/{id}', [CashReceivedController::class, 'edit'])->name("cash.edit");
+            Route::get('/delete/{id}', [CashReceivedController::class, 'delete'])->name("cash.delete");
+            Route::get('/view/receipt/{id}', [CashReceivedController::class, 'viewreceipt'])->name("cash.view.receipt");
+            Route::post('/update/{id}', [CashReceivedController::class, 'update'])->name("update.cash");
+            //index
+            Route::get('/', [CashReceivedController::class, 'index'])->name("index.cash");
         });
 
 

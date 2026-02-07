@@ -217,6 +217,7 @@
                                 <ul>
                                     <li>Only check warranty for {{ $invoice->backup }}.</li>
                                     <li>If any issue is reported within the backup days, the phone must be returned in the same condition as it was at the time of purchase for further processing.</li>
+                                    <li>Dead phone has no warranty.</li>
                                     <li>Check following things before leaving shop because they have no Warranty.</li>
                                 </ul>
                                 <ol>

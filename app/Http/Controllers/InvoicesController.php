@@ -25,6 +25,9 @@ class InvoicesController extends Controller
         if ($request->filled('invoice_id')) {
             $query->where('invoices.invoice_id', $request->invoice_id);
         }
+        if ($request->filled('account_id')) {
+            $query->where('invoices.account_id', $request->account_id);
+        }
         if ($request->filled('invoice_no')) {
             $query->where('invoices.id', $request->invoice_no);
         }
@@ -35,8 +38,8 @@ class InvoicesController extends Controller
         $invoices = $query
             ->orderBy('invoices.created_at', 'desc')
             ->paginate(500);
-
-        return view('invoices.index', compact('invoices'));
+            $accounts=DB::table('accounts')->get();
+        return view('invoices.index', compact('invoices','accounts'));
     }
 
 

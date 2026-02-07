@@ -15,7 +15,6 @@
                     <div class="d-flex align-items-center">
                         <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family: cursive;">Invoices</h3>
                         <h5 class="mt-1 d-block d-sm-block d-lg-none d-md-none" style="font-family: cursive;">Invoices</h5>
-
                         <div class="ms-4 d-none d-lg-block">
                             <span id="togglePurchasePriceButton" style="cursor: pointer;color:black">
                                 <i class="bx bx-show"></i> Show Profit
@@ -80,15 +79,27 @@
         <div class="card mb-2 p-2 mt-2">
             <form action="" method="GET">
                 <div class="row">
-                    <div class="col-lg-5 col-md-4 col-sm-4 col-6 mt-1 mb-1">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-6 mt-1 mb-1">
+                        <select name="account_id" class="form-select" id="acc-select" onchange="this.form.submit()">
+                            <option value="{{ null }}">Select Account</option>
+                            @foreach ($accounts as $account)
+                                <option value="{{ $account->id }}"
+                                    {{ request()->account_id == $account->id ? 'selected' : '' }}>
+                                    {{ $account->id . ')' . $account->customer_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-6 mt-1 mb-1">
                         <input type="text" class="form-control" value="{{ request()->invoice_id }}"
                             placeholder="Invoice Id" name="invoice_id">
                     </div>
 
-                    <div class="col-lg-5 col-md-4 col-sm-4 col-6 mt-1 mb-1">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-6 mt-1 mb-1">
                         <input type="date" class="form-control" value="{{ request()->date }}" name="date">
                     </div>
-                    <div class="col-lg-2 col-md-4 col-sm-4 mt-1 mb-1">
+                    <div class="col-lg-3 col-md-4 col-sm-4 mt-1 mb-1">
                         <div class="btn-group w-100">
                             <a href="{{ url('admin/invoices') }}" title="Clear" class="btn btn-outline-danger">Clear</a>
                             <button type="submit" title="Search" class="btn btn-outline-success">Search</button>
@@ -109,20 +120,21 @@
         </div>
 
 
-        @if ($invoices->count() > 0 && (request()->invoice_id || request()->date))
+        @if ($invoices->count() > 0 && (request()->invoice_id || request()->date || request()->account_id))
             <div class="alert bg-primary text-white mt-3">
                 <strong>{{ $invoices->count() }}
                     {{ $invoices->count() > 0 && $invoices->count() < 2 ? 'Result' : 'Results' }}
                     Found</strong>
             </div>
-        @elseif ($invoices->count() < 1 && (request()->invoice_id || request()->date))
+        @elseif ($invoices->count() < 1 && (request()->invoice_id || request()->date || request()->account_id))
             <div class="alert bg-warning text-white mt-3">
                 <strong>No Results Found !</strong>
             </div>
         @endif
 
 
-        <label for="" class="text-dark"><strong class="text-danger">Note: </strong>Invoice Can Only Be Returned Within Backup Days of Sold Phone.</label>
+        <label for="" class="text-dark"><strong class="text-danger">Note: </strong>Invoice Can Only Be Returned
+            Within Backup Days This Rule Is Only For Counter Sale Phones.</label>
 
         <div class="card p-2 mb-0">
             @if ($invoices->count() > 0)
@@ -201,32 +213,35 @@
                                                         href="{{ route('invoice.view', ['id' => $invoice->id]) }}">View
                                                         Invoice</a>
                                                 </li>
-                                                {{-- <li>
-                                                    <a class="dropdown-item"
-                                                        onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">Mark
-                                                        As Returned</a>
-                                                </li> --}}
 
                                                 @php
-    // Extract number from "1 Day", "2 Days"
-    $backupDays = (int) filter_var($invoice->backup, FILTER_SANITIZE_NUMBER_INT);
+                                                    $backupDays = (int) filter_var(
+                                                        $invoice->backup,
+                                                        FILTER_SANITIZE_NUMBER_INT,
+                                                    );
+                                                    $daysPassed = \Carbon\Carbon::parse(
+                                                        $invoice->sold_date,
+                                                    )->diffInDays(\Carbon\Carbon::now());
+                                                    $remainingDays = $backupDays - $daysPassed;
+                                                @endphp
 
-    // Calculate days passed
-    $daysPassed = \Carbon\Carbon::parse($invoice->sold_date)
-                    ->diffInDays(\Carbon\Carbon::now());
-
-    // Remaining days
-    $remainingDays = $backupDays - $daysPassed;
-@endphp
-
-@if ($remainingDays > 0)
-    <li>
-        <a class="dropdown-item"
-           onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">
-            Mark As Returned
-        </a>
-    </li>
-@endif
+                                                @if ($invoice->account_id == 1)
+                                                    @if ($remainingDays > 0)
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">
+                                                                Mark As Returned
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                @else
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            onclick="confirmDelete('{{ route('stock.returned', ['id' => $invoice->stock_id, 'invoice_id' => $invoice->id]) }}')">
+                                                            Mark As Returned
+                                                        </a>
+                                                    </li>
+                                                @endif
 
 
                                             </ul>
@@ -282,5 +297,41 @@
                 }
             })
         }
+    </script>
+
+
+    <style>
+        .select2-container--default .select2-selection--single {
+            display: block;
+            width: 100%;
+            padding: 0.300rem 0.200rem 0.300rem 0.200rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            height: auto;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 50%;
+            right: 0.32rem;
+            transform: translateY(-50%);
+            height: auto;
+        }
+    </style>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+    <script>
+        $('#acc-select').select2({
+            placeholder: 'Select Account',
+            allowClear: true
+        });
     </script>
 @endsection

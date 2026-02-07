@@ -127,17 +127,22 @@
                     </div>
 
 
-                       <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
-                      <select name="pta_status" class="form-control" onchange="this.form.submit()" id="">
-                        <option value="">PTA Status</option>
-                        <option value="Official Approved" {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>Official Approved</option>
-                        <option value="Not Approved" {{ request()->pta_status == 'Not Approved' ? 'selected' : '' }}>Not Approved</option>
-                        @if (request()->type == 'apple')
-<option value="Not Approved (4 months remaining)" {{ request()->pta_status == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>Not Approved (4 months remaining)</option>
-                        @endif
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
+                        <select name="pta_status" class="form-control" onchange="this.form.submit()" id="">
+                            <option value="">PTA Status</option>
+                            <option value="Official Approved"
+                                {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>Official Approved
+                            </option>
+                            <option value="Not Approved" {{ request()->pta_status == 'Not Approved' ? 'selected' : '' }}>
+                                Not Approved</option>
+                            @if (request()->type == 'apple')
+                                <option value="Not Approved (4 months remaining)"
+                                    {{ request()->pta_status == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
+                                    Not Approved (4 months remaining)</option>
+                            @endif
 
 
-                         @if (request()->type == 'others')
+                            @if (request()->type == 'others')
                                 <option value="Patch Approved"
                                     {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>Patch
                                     Approved</option>
@@ -146,7 +151,7 @@
                                     Approved</option>
                             @endif
 
-                      </select>
+                        </select>
                     </div>
 
 
@@ -164,12 +169,16 @@
         </div>
 
 
-        @if ($stocks->count() > 0 && (request()->model_name || request()->company_name || request()->imei1 || request()->pta_status))
+        @if (
+            $stocks->count() > 0 &&
+                (request()->model_name || request()->company_name || request()->imei1 || request()->pta_status))
             <div class="alert bg-primary text-white mt-3">
                 <strong>{{ $stocks->count() }} {{ $stocks->count() > 0 && $stocks->count() < 2 ? 'Result' : 'Results' }}
                     Found</strong>
             </div>
-        @elseif ($stocks->count() < 1 && (request()->model_name || request()->company_name || request()->imei1 || request()->pta_status))
+        @elseif (
+            $stocks->count() < 1 &&
+                (request()->model_name || request()->company_name || request()->imei1 || request()->pta_status))
             <div class="alert bg-warning text-white mt-3">
                 <strong>No Results Found !</strong>
             </div>
@@ -226,8 +235,9 @@
 
                                     <td class="text-dark fw-bold" title="Edit Stock" style="font-size: 20px">
 
-                                        <a href="{{ route('stock.edit', ['type' => request()->type, 'id' => $stock->id]) }}">
-                                             {{ 'Rs.' . number_format($stock->sale) }}
+                                        <a
+                                            href="{{ route('stock.edit', ['type' => request()->type, 'id' => $stock->id]) }}">
+                                            {{ 'Rs.' . number_format($stock->sale) }}
                                         </a>
                                     </td>
                                     <td class="text-dark">{{ $stock->created_at->format('d M y') }}</td>
@@ -251,7 +261,8 @@
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('stock.view', ['id' => $stock->id]) }}">View Details</a>
+                                                        href="{{ route('stock.view', ['id' => $stock->id]) }}">View
+                                                        Details</a>
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item"
@@ -359,7 +370,31 @@
                             </div>
                         </div>
 
+
+
+
                         <div class="row mt-2">
+                            <div class="col-lg-12 col-12">
+                                <div class="form-group">
+                                    <label for="buyerName" class="fw-bold text-dark mb-1">Select Account <span
+                                            class="text-danger">*</span></label>
+                                    <select name="account_id" required class="form-select" id="accountSelect">
+                                        <option value="">Select Account</option>
+                                        @foreach ($accounts as $account)
+                                         <option value="{{ $account->id }}"
+            data-name="{{ $account->customer_name }}"
+            data-phone="{{ $account->customer_phone }}">
+            {{ $account->customer_name }}
+        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        {{-- <div class="row mt-2">
                             <div class="col-lg-6 col-6">
                                 <div class="form-group">
                                     <label for="buyerName" class="fw-bold text-dark mb-1">Buyer Name <span
@@ -376,7 +411,73 @@
                                         id="buyerPhone" name="buyer_phone">
                                 </div>
                             </div>
+                        </div> --}}
+
+
+                        {{-- <select name="account_id" required class="form-select mt-2" id="accountSelect">
+                            <option value="">Select Account</option>
+                            @foreach ($accounts as $account)
+                                <option value="{{ $account->id }}" data-name="{{ $account->customer_name }}"
+                                    data-phone="{{ $account->customer_phone }}">
+                                    {{ $account->customer_name }}
+                                </option>
+                            @endforeach
+                        </select> --}}
+
+
+                        <div class="row mt-2" id="buyerFields" style="display: none">
+                            <div class="col-lg-6 col-6">
+                                <div class="form-group">
+                                    <label class="fw-bold text-dark mb-1">
+                                        Buyer Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" placeholder="Buyer Name" id="buyerName"
+                                        name="buyer_name">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-6">
+                                <div class="form-group">
+                                    <label class="fw-bold text-dark mb-1">
+                                        Buyer Phone (optional)
+                                    </label>
+                                    <input type="text" class="form-control" maxlength="12"
+                                        placeholder="0399-99999999" id="buyerPhone" name="buyer_phone">
+                                </div>
+                            </div>
                         </div>
+
+
+                        <script>
+                            document.getElementById('accountSelect').addEventListener('change', function() {
+                                const buyerFields = document.getElementById('buyerFields');
+                                const buyerName = document.getElementById('buyerName');
+                                const buyerPhone = document.getElementById('buyerPhone');
+
+                                const selectedOption = this.options[this.selectedIndex];
+                                const accountId = this.value;
+
+                                if (accountId == 1) {
+                                    // Show fields for manual entry
+                                    buyerFields.style.display = 'flex';
+                                    buyerName.value = '';
+                                    buyerPhone.value = '';
+                                    buyerName.required = true;
+                                } else if (accountId) {
+                                    // Hide fields & auto-fill
+                                    buyerFields.style.display = 'none';
+                                    buyerName.value = selectedOption.dataset.name || '';
+                                    buyerPhone.value = selectedOption.dataset.phone || '';
+                                    buyerName.required = false;
+                                } else {
+                                    // Reset if no account selected
+                                    buyerFields.style.display = 'flex';
+                                    buyerName.value = '';
+                                    buyerPhone.value = '';
+                                }
+                            });
+                        </script>
+
 
 
 
@@ -385,20 +486,24 @@
                                 <div class="form-group">
                                     <label for="buyerName" class="fw-bold text-dark mb-1">Backup Days <span
                                             class="text-danger">*</span></label>
-                                 <select name="backup" required class="form-select" id="">
-                                    <option value="1 Day">1 Day</option>
-                                    <option value="2 Days">2 Days</option>
-                                    <option value="3 Days">3 Days</option>
-                                    <option value="4 Days">4 Days</option>
-                                    <option value="5 Days">5 Days</option>
-                                    <option value="6 Days">6 Days</option>
-                                    <option value="7 Days">7 Days</option>
-                                    <option value="10 Days">10 Days</option>
-                                    <option value="14 Days">14 Days</option>
-                                 </select>
+                                    <select name="backup" required class="form-select" id="">
+                                        <option value="">Select Backup</option>
+                                        <option value="1 Day">1 Day</option>
+                                        <option value="2 Days">2 Days</option>
+                                        <option value="3 Days">3 Days</option>
+                                        <option value="4 Days">4 Days</option>
+                                        <option value="5 Days">5 Days</option>
+                                        <option value="6 Days">6 Days</option>
+                                        <option value="7 Days">7 Days</option>
+                                        <option value="10 Days">10 Days</option>
+                                        <option value="14 Days">14 Days</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
+
+
+
 
 
                     </div>

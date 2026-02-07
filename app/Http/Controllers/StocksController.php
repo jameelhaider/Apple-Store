@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Accounts;
 use App\Models\Invoices;
 use App\Models\Stocks;
 use Illuminate\Http\Request;
@@ -34,7 +35,8 @@ class StocksController extends Controller
             $stocks = $query
                 ->orderBy('created_at', 'desc')
                 ->paginate(1000);
-            return view('stocks.index', compact('stocks'));
+            $accounts = DB::table('accounts')->get();
+            return view('stocks.index', compact('stocks', 'accounts'));
         } else {
             return abort(401);
         }
@@ -210,6 +212,7 @@ class StocksController extends Controller
             'buyer_phone' => 'nullable|string|max:20',
             'sale_price' => 'required|numeric|min:0',
         ]);
+        $account = DB::table('accounts')->where('id', $request->account_id)->first();
         $stock = Stocks::findOrFail($request->stock_id);
         $profit = $request->sale_price - $stock->purchase;
         $invoice = Invoices::create([
@@ -221,8 +224,16 @@ class StocksController extends Controller
             'buyer_name'  => $request->buyer_name,
             'buyer_phone' => $request->buyer_phone,
             'backup' => $request->backup,
+            'account_id' => $request->account_id,
         ]);
         $stock->update(['status' => 'Sold Out']);
+        if ($account->id != 1) {
+            DB::table('accounts')
+                ->where('id', $account->id)
+                ->update([
+                    'prev_balance' => $account->prev_balance + $request->sale_price
+                ]);
+        }
         return redirect()->route('invoice.view', ['id' => $invoice->id])->with('success', 'Stock marked as sold successfully.');
     }
 
@@ -230,15 +241,28 @@ class StocksController extends Controller
 
     public function returned($id, $invoice_id)
     {
-        if (Gate::allows('is_admin')) {
-            $invoice = Invoices::find($invoice_id);
-            $invoice->delete();
-            $stock = Stocks::find($id);
-            $stock->status = 'Available';
-            $stock->save();
-            return redirect()->back()->with('success', 'Stock marked as returned successfully.');
-        } else {
-            return abort(401);
+        if (!Gate::allows('is_admin')) {
+            abort(401);
         }
+        DB::transaction(function () use ($id, $invoice_id) {
+            $invoice = Invoices::findOrFail($invoice_id);
+            $stock   = Stocks::findOrFail($id);
+            $stock->update([
+                'status' => 'Available'
+            ]);
+            if ($invoice->account_id != 1) {
+                $account = Accounts::findOrFail($invoice->account_id);
+
+                $account->update([
+                    'prev_balance' => $account->prev_balance - $invoice->total_bill
+                ]);
+            }
+            $invoice->delete();
+        });
+
+        return redirect()->back()->with(
+            'success',
+            'Stock marked as returned successfully.'
+        );
     }
 }

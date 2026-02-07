@@ -235,6 +235,32 @@
                 </li>
 
 
+                 <!-- Accounts -->
+                    <li
+                        class="menu-header small text-uppercase fw-bold {{ Request::is('admin/accounts*') ? '' : 'text-dark' }}">
+                        <span class="menu-header-text">Accounts | Cash</span>
+                    </li>
+                    <li
+                        class="menu-item {{ Request::is('admin/accounts') || Request::is('admin/accounts/create') ? 'active' : '' }}">
+                        <a href="{{ url('admin/accounts') }}"
+                            class="menu-link {{ Request::is('admin/accounts*') ? '' : 'text-dark' }} d-flex align-items-center">
+                            <i class="menu-icon tf-icons bx bx-user"></i>
+                            <div data-i18n="Support" class="flex-grow-1">Accounts</div>
+                            @php $totalAccounts = DB::table('accounts')->count(); @endphp
+                            <span
+                                class="badge badge-center rounded-pill bg-primary w-px-20 h-px-20 ms-auto">{{ $totalAccounts }}</span>
+                        </a>
+                    </li>
+                    <li
+                        class="menu-item {{ Request::is('admin/cash-received') || Request::is('admin/cash-received/create') ? 'active' : '' }}">
+                        <a href="{{ url('admin/cash-received') }}"
+                            class="menu-link {{ Request::is('admin/cash-received*') ? '' : 'text-dark' }} d-flex align-items-center">
+                            <i class="menu-icon tf-icons bx bx-money"></i>
+                            <div data-i18n="Support">Received Amounts</div>
+                        </a>
+                    </li>
+
+
 
 
                   <!-- Device Info -->

@@ -120,6 +120,25 @@
             </div>
         </div>
 
+
+
+         <h2 class="fw-bold text-center text-dark">Total Cash Remainings To Receive</h2>
+        <div class="row justify-content-around">
+            <div class="col-lg-12 col-12 col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="card-icon bx bx-money"></i>
+                        Cash To Receive
+                    </div>
+
+                    <div class="card-body text-center count-animation text-primary" data-count="{{ $totalrem }}">
+                        RS.0
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
         <!-- Password Modal -->
         <div class="modal fade" id="passwordModal" tabindex="-1">
             <div class="modal-dialog">
