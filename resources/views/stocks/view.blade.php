@@ -194,14 +194,14 @@
 
                         <div class="col-md-4">
                             <div class="info-box">
-                                <span>Activation</span>
+                                <span>Activation Status</span>
                                 <strong>{{ $stock->activation_status }}</strong>
                             </div>
                         </div>
 
                         <div class="col-md-4">
                              <div class="info-box">
-                                <span>Country</span>
+                                <span>Country Lock Status</span>
                                 <strong>{{ $stock->country_status }}</strong>
                             </div>
                         </div>

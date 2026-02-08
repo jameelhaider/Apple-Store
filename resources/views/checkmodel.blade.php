@@ -50,10 +50,10 @@
 
                                 @if (request()->imei && $response)
                                     <div class="p-3"
-                                        style="background-color:  #2b2b2b;border-radius:20px; height: auto;">
+                                        style="background-color:  #747373;border-radius:20px; height: auto;">
                                     @else
                                         <div class="p-3"
-                                            style="background-color:  #2b2b2b;border-radius:20px;height:180px;">
+                                            style="background-color:  #747373;border-radius:20px;height:180px;">
                                 @endif
 
                                 <div class="input-group mb-3">

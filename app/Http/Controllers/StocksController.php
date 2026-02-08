@@ -42,33 +42,33 @@ class StocksController extends Controller
         }
     }
 
-   public function view($id)
-{
-    Gate::authorize('is_admin');
-    $stock = DB::table('stocks')
-        ->leftJoin('invoices', 'invoices.stock_id', '=', 'stocks.id')
-        ->leftjoin('dealers', 'stocks.dealer_id', '=', 'dealers.id')
-        ->select(
-            'stocks.*',
-            'invoices.total_bill',
-            'invoices.buyer_name',
-            'invoices.buyer_phone',
-            'invoices.sold_date',
-            'invoices.backup',
-            'dealers.bussiness_name as dealer_bussiness',
-            'dealers.name as dealer_name',
-            'dealers.phone as dealer_phone',
-            'dealers.address as dealer_address',
-        )
-        ->where('stocks.id', $id)
-        ->first();
+    public function view($id)
+    {
+        Gate::authorize('is_admin');
+        $stock = DB::table('stocks')
+            ->leftJoin('invoices', 'invoices.stock_id', '=', 'stocks.id')
+            ->leftjoin('dealers', 'stocks.dealer_id', '=', 'dealers.id')
+            ->select(
+                'stocks.*',
+                'invoices.total_bill',
+                'invoices.buyer_name',
+                'invoices.buyer_phone',
+                'invoices.sold_date',
+                'invoices.backup',
+                'dealers.bussiness_name as dealer_bussiness',
+                'dealers.name as dealer_name',
+                'dealers.phone as dealer_phone',
+                'dealers.address as dealer_address',
+            )
+            ->where('stocks.id', $id)
+            ->first();
 
-    if (!$stock) {
-        abort(404, 'Stock not found');
+        if (!$stock) {
+            abort(404, 'Stock not found');
+        }
+
+        return view('stocks.view', compact('stock'));
     }
-
-    return view('stocks.view', compact('stock'));
-}
 
 
 
@@ -79,7 +79,7 @@ class StocksController extends Controller
         if (Gate::allows('is_admin')) {
             $stock = new Stocks();
             $dealers = DB::table('dealers')->get();
-            return view("stocks.create", compact('stock','dealers'));
+            return view("stocks.create", compact('stock', 'dealers'));
         } else {
             return abort(401);
         }
@@ -93,7 +93,7 @@ class StocksController extends Controller
             $dealers = DB::table('dealers')->get();
             if (!$stock)
                 return redirect()->back();
-            return view("stocks.create", compact('stock','dealers'));
+            return view("stocks.create", compact('stock', 'dealers'));
         } else {
             return abort(401);
         }
@@ -112,10 +112,20 @@ class StocksController extends Controller
                 'imei1' => [
                     'required',
                     'digits:15',
+                    function ($attribute, $value, $fail) {
+                        if (!isValidImei($value)) {
+                            $fail('The ' . $attribute . ' is not a valid IMEI number.');
+                        }
+                    },
                 ],
                 'imei2' => [
                     'nullable',
                     'digits:15',
+                    function ($attribute, $value, $fail) {
+                        if (!isValidImei($value)) {
+                            $fail('The ' . $attribute . ' is not a valid IMEI number.');
+                        }
+                    },
                 ],
                 'pta_status'           => 'required|in:Official Approved,Not Approved,Not Approved (4 months remaining),Patch Approved,CPID Approved',
                 'ram'                  => 'nullable|string|max:20',
@@ -132,7 +142,7 @@ class StocksController extends Controller
                 $stock->model_name = ucfirst(strtolower($request->model_name));
             }
 
-             if ($request->purchasing_from == 'Local') {
+            if ($request->purchasing_from == 'Local') {
                 $stock->pushasing_from_name = $request->pushasing_from_name;
                 $stock->pushasing_from_phone = $request->pushasing_from_phone;
                 $stock->pushasing_from_cnic = $request->pushasing_from_cnic;
@@ -180,10 +190,20 @@ class StocksController extends Controller
                 'imei1' => [
                     'required',
                     'digits:15',
+                    function ($attribute, $value, $fail) {
+                        if (!isValidImei($value)) {
+                            $fail('The ' . $attribute . ' is not a valid IMEI number.');
+                        }
+                    },
                 ],
                 'imei2' => [
                     'nullable',
                     'digits:15',
+                    function ($attribute, $value, $fail) {
+                        if (!isValidImei($value)) {
+                            $fail('The ' . $attribute . ' is not a valid IMEI number.');
+                        }
+                    },
                 ],
                 'pta_status'           => 'required|in:Official Approved,Not Approved,Not Approved (4 months remaining),Patch Approved,CPID Approved',
                 'ram'                  => 'nullable|string|max:20',
@@ -202,7 +222,7 @@ class StocksController extends Controller
                 $stock->model_name = ucfirst(strtolower($request->model_name));
             }
 
-             if ($request->purchasing_from == 'Local') {
+            if ($request->purchasing_from == 'Local') {
                 $stock->pushasing_from_name = $request->pushasing_from_name;
                 $stock->pushasing_from_phone = $request->pushasing_from_phone;
                 $stock->pushasing_from_cnic = $request->pushasing_from_cnic;
