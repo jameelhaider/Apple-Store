@@ -42,16 +42,34 @@ class StocksController extends Controller
         }
     }
 
-    public function view($id)
-    {
-        if (Gate::allows('is_admin')) {
-            $stock = DB::table('stocks')
-                ->where('stocks.id', $id)->first();
-            return view('stocks.view', compact('stock'));
-        } else {
-            return abort(401);
-        }
+   public function view($id)
+{
+    Gate::authorize('is_admin');
+    $stock = DB::table('stocks')
+        ->leftJoin('invoices', 'invoices.stock_id', '=', 'stocks.id')
+        ->leftjoin('dealers', 'stocks.dealer_id', '=', 'dealers.id')
+        ->select(
+            'stocks.*',
+            'invoices.total_bill',
+            'invoices.buyer_name',
+            'invoices.buyer_phone',
+            'invoices.sold_date',
+            'invoices.backup',
+            'dealers.bussiness_name as dealer_bussiness',
+            'dealers.name as dealer_name',
+            'dealers.phone as dealer_phone',
+            'dealers.address as dealer_address',
+        )
+        ->where('stocks.id', $id)
+        ->first();
+
+    if (!$stock) {
+        abort(404, 'Stock not found');
     }
+
+    return view('stocks.view', compact('stock'));
+}
+
 
 
 
@@ -60,7 +78,8 @@ class StocksController extends Controller
     {
         if (Gate::allows('is_admin')) {
             $stock = new Stocks();
-            return view("stocks.create", compact('stock'));
+            $dealers = DB::table('dealers')->get();
+            return view("stocks.create", compact('stock','dealers'));
         } else {
             return abort(401);
         }
@@ -71,9 +90,10 @@ class StocksController extends Controller
     {
         if (Gate::allows('is_admin')) {
             $stock = Stocks::find($id);
+            $dealers = DB::table('dealers')->get();
             if (!$stock)
                 return redirect()->back();
-            return view("stocks.create", compact('stock'));
+            return view("stocks.create", compact('stock','dealers'));
         } else {
             return abort(401);
         }
@@ -112,6 +132,20 @@ class StocksController extends Controller
                 $stock->model_name = ucfirst(strtolower($request->model_name));
             }
 
+             if ($request->purchasing_from == 'Local') {
+                $stock->pushasing_from_name = $request->pushasing_from_name;
+                $stock->pushasing_from_phone = $request->pushasing_from_phone;
+                $stock->pushasing_from_cnic = $request->pushasing_from_cnic;
+                $stock->pushasing_from_address = $request->pushasing_from_address;
+                $stock->dealer_id = null;
+            } elseif ($request->purchasing_from == 'Dealer') {
+                $stock->pushasing_from_name = null;
+                $stock->pushasing_from_phone = null;
+                $stock->pushasing_from_cnic = null;
+                $stock->pushasing_from_address = null;
+                $stock->dealer_id = $request->dealer_id;
+            }
+            $stock->purchasing_from = $request->purchasing_from;
             $stock->company_name = $request->company_name;
             $stock->rom = $request->rom;
             $stock->ram = $request->ram;
@@ -167,6 +201,21 @@ class StocksController extends Controller
             } else {
                 $stock->model_name = ucfirst(strtolower($request->model_name));
             }
+
+             if ($request->purchasing_from == 'Local') {
+                $stock->pushasing_from_name = $request->pushasing_from_name;
+                $stock->pushasing_from_phone = $request->pushasing_from_phone;
+                $stock->pushasing_from_cnic = $request->pushasing_from_cnic;
+                $stock->pushasing_from_address = $request->pushasing_from_address;
+                $stock->dealer_id = null;
+            } elseif ($request->purchasing_from == 'Dealer') {
+                $stock->pushasing_from_name = null;
+                $stock->pushasing_from_phone = null;
+                $stock->pushasing_from_cnic = null;
+                $stock->pushasing_from_address = null;
+                $stock->dealer_id = $request->dealer_id;
+            }
+            $stock->purchasing_from = $request->purchasing_from;
             $stock->company_name = $request->company_name;
             $stock->rom = $request->rom;
             $stock->ram = $request->ram;

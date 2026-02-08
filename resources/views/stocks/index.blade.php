@@ -216,7 +216,7 @@
                                     @endif
 
                                     <td class="text-dark fw-bold" title="View Details" style="font-size: 16px;">
-                                        <a href="{{ route('stock.view', ['id' => $stock->id]) }}">
+                                        <a href="{{ route('stock.view',['id'=>$stock->id]) }}">
                                             {{ $stock->model_name }}
                                         </a>
 

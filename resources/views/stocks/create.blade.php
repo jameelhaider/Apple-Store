@@ -66,11 +66,124 @@
                     <input type="hidden" name="company_name" value="Apple">
                 @endif
 
+
+
+
+
+                <div class="row">
+                    <!-- Purchasing From -->
+                    <div class="col-lg-4 col-md-4">
+                        <label class="fw-bold mb-2 text-dark">PURCHASING FROM<span class="text-danger">*</span></label>
+                        <select name="purchasing_from" class="form-select @error('purchasing_from') is-invalid @enderror"
+                            id="purchasing-from" required>
+                            <option value="">Select Option</option>
+                            <option value="Local"
+                                {{ old('purchasing_from', $stock->purchasing_from) == 'Local' ? 'selected' : '' }}>Local
+                            </option>
+                            <option value="Dealer"
+                                {{ old('purchasing_from', $stock->purchasing_from) == 'Dealer' ? 'selected' : '' }}>Dealer
+                            </option>
+                        </select>
+                        @error('purchasing_from')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                    <!-- Dealer Information -->
+                    <div class="col-lg-4 col-md-4" id="DealerInformation" style="display:none;">
+                        <label class="fw-bold mb-2 text-dark">SELECT DEALER<span class="text-danger">*</span></label>
+                        <select name="dealer_id" id="dealer-select"
+                            class="form-select @error('dealer_id') is-invalid @enderror">
+                            <option value="">Select Dealer</option>
+                            @foreach ($dealers as $dealer)
+                                <option value="{{ $dealer->id }}"
+                                    {{ old('dealer_id', $stock->dealer_id) == $dealer->id ? 'selected' : '' }}>
+                                    {{ $dealer->name . ' ( ' . $dealer->bussiness_name . ' )' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('dealer_id')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+
+                </div>
+
+
+                <div id="SellerInformation" style="display:none;">
+                    <div class="row mt-4">
+                        <hr>
+                        <h4 class="fw-bold mb-3 text-dark">Seller Information</h4>
+                        <hr>
+
+                        {{-- Name --}}
+                        <div class="col-lg-4 col-md-4 col-6">
+                            <label class="fw-bold mb-2 text-dark">NAME<span class="text-danger">*</span></label>
+                            <input type="text" placeholder="Name"
+                                value="{{ old('pushasing_from_name', $stock->pushasing_from_name) }}"
+                                class="form-control @error('pushasing_from_name') is-invalid @enderror"
+                                name="pushasing_from_name" id="name-field">
+                            @error('pushasing_from_name')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                        </div>
+
+                        {{-- Phone --}}
+                        <div class="col-lg-4 col-md-4 col-6">
+                            <label class="fw-bold mb-2 text-dark">PHONE<span class="text-danger">*</span></label>
+                            <input type="text" maxlength="12" placeholder="0399-99999999"
+                                data-inputmask="'mask': '0399-99999999'"
+                                value="{{ old('pushasing_from_phone', $stock->pushasing_from_phone) }}"
+                                class="form-control @error('pushasing_from_phone') is-invalid @enderror"
+                                name="pushasing_from_phone" id="phone-field">
+                            @error('pushasing_from_phone')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                        </div>
+
+                        {{-- CNIC --}}
+                        <div class="col-lg-4 col-md-4">
+                            <label class="fw-bold mb-2 text-dark">CNIC<span class="text-danger">*</span></label>
+                            <input type="text" data-inputmask="'mask': '99999-9999999-9'" placeholder="XXXXX-XXXXXXX-X"
+                                value="{{ old('pushasing_from_cnic', $stock->pushasing_from_cnic) }}"
+                                class="form-control @error('pushasing_from_cnic') is-invalid @enderror"
+                                name="pushasing_from_cnic" id="cnic-field">
+                            @error('pushasing_from_cnic')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                        </div>
+
+                        {{-- Address --}}
+                        <div class="col-lg-4 col-md-4 mt-3">
+                            <label class="fw-bold mb-2 text-dark">ADDRESS<span class="text-danger">*</span></label>
+                            <textarea name="pushasing_from_address" placeholder="Address"
+                                class="form-control @error('pushasing_from_address') is-invalid @enderror" id="address-field" cols="30"
+                                rows="3">{{ old('pushasing_from_address', $stock->pushasing_from_address) }}</textarea>
+                            @error('pushasing_from_address')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+
+
                 <div class="row mt-3">
                     <hr>
                     <h4 class="fw-bold mb-3">Stock Information</h4>
                     <hr>
                 </div>
+
+
+
+
                 <div class="row">
                     @if (request()->type == 'apple')
                         <div class="col-lg-8 col-md-8 col-12">
@@ -112,7 +225,8 @@
 
 
 
-                            <select name="company_name" required class="form-select @error('company_name') is-invalid @enderror">
+                            <select name="company_name" required
+                                class="form-select @error('company_name') is-invalid @enderror">
                                 <option value="">Select Company</option>
 
                                 @foreach (other_companies() as $company)
@@ -155,8 +269,8 @@
                     <!-- IMEI -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">IMEI 1<span class="text-danger">*</span></label>
-                        <input type="text" pattern="\d{15}" maxlength="15" required placeholder="IMEI" name="imei1"
-                            value="{{ old('imei1', $stock->imei1) }}"
+                        <input type="text" pattern="\d{15}" maxlength="15" required placeholder="IMEI"
+                            name="imei1" value="{{ old('imei1', $stock->imei1) }}"
                             class="form-control @error('imei1') is-invalid @enderror">
                         @error('imei1')
                             <span class="invalid-feedback" role="alert">
@@ -442,29 +556,6 @@
     </script>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
-    <script>
-        $('#dealer-select').select2({
-            placeholder: 'Select Dealer',
-            allowClear: true
-        });
-
-        $('#color-select').select2({
-            placeholder: 'Select Color',
-            allowClear: true
-        });
-
-        $('#quality-select').select2({
-            placeholder: 'Select Quality',
-            allowClear: true
-        });
-
-        $('#type-select').select2({
-            placeholder: 'Select Type',
-            allowClear: true
-        });
-    </script>
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -510,5 +601,52 @@
         });
     </script>
 
+
+
+
+
+    <script>
+        function handlePurchasingFromChange() {
+            var value = document.getElementById('purchasing-from').value;
+            var sellerInfo = document.getElementById('SellerInformation');
+            var dealerInfo = document.getElementById('DealerInformation');
+
+            var nameField = document.getElementById('name-field');
+            var phoneField = document.getElementById('phone-field');
+            var cnicField = document.getElementById('cnic-field');
+            var addressField = document.getElementById('address-field');
+            var DealerSelect = document.getElementById('dealer-select');
+
+            if (value === 'Local') {
+                sellerInfo.style.display = 'block';
+                dealerInfo.style.display = 'none';
+                nameField.setAttribute('required', 'required');
+                phoneField.setAttribute('required', 'required');
+                cnicField.setAttribute('required', 'required');
+                addressField.setAttribute('required', 'required');
+                DealerSelect.removeAttribute('required');
+            } else if (value === 'Dealer') {
+                sellerInfo.style.display = 'none';
+                dealerInfo.style.display = 'block';
+                nameField.removeAttribute('required');
+                phoneField.removeAttribute('required');
+                cnicField.removeAttribute('required');
+                addressField.removeAttribute('required');
+                DealerSelect.setAttribute('required', 'required');
+            } else {
+                sellerInfo.style.display = 'none';
+                dealerInfo.style.display = 'none';
+                nameField.removeAttribute('required');
+                phoneField.removeAttribute('required');
+                cnicField.removeAttribute('required');
+                addressField.removeAttribute('required');
+                DealerSelect.removeAttribute('required');
+            }
+        }
+        document.getElementById('purchasing-from').addEventListener('change', handlePurchasingFromChange);
+        document.addEventListener('DOMContentLoaded', function() {
+            handlePurchasingFromChange();
+        });
+    </script>
 
 @endsection

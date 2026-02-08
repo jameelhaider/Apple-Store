@@ -213,6 +213,12 @@
                                                         href="{{ route('invoice.view', ['id' => $invoice->id]) }}">View
                                                         Invoice</a>
                                                 </li>
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('stock.view',['id'=>$invoice->stock_id]) }}">View
+                                                        Details</a>
+                                                </li>
+
 
                                                 @php
                                                     $backupDays = (int) filter_var(

@@ -47,39 +47,254 @@
         </style>
 
 
-        <div class="card rounded-0 p-3 mt-3">
-            <ul class="list-group list-group-flush mt-2">
-                <li class="list-group-item"><span class="text-dark fw-bold">Company</span> <span
-                        class="text-dark float-end">{{ $stock->company_name }}</span></li>
-                <li class="list-group-item"><span class="text-dark fw-bold">Model</span> <span
-                        class="text-dark float-end">{{ $stock->model_name }}</span></li>
-                <li class="list-group-item"><span class="text-dark fw-bold">IMEI 1</span> <span
-                        class="text-dark float-end">{{ $stock->imei1 }}</span></li>
-                <li class="list-group-item"><span class="text-dark fw-bold">IMEI 2</span> <span
-                        class="text-dark float-end">{{ $stock->imei2 }}</span></li>
+        <div class="card shadow border-0 mt-4">
+            <div class="card-body p-4">
 
-                @if ($stock->type == 'apple')
-                    <li class="list-group-item"><span class="text-dark fw-bold">Battery Health</span> <span
-                            class="text-dark float-end">{{ $stock->health . '%' }}</span></li>
+                {{-- ================= PURCHASE DETAILS ================= --}}
+                <div class="mb-5">
+                    <h4 class="fw-bold text-primary border-bottom pb-2 mb-4">
+                        <i class="bi bi-receipt me-2"></i>Purchase Details
+                    </h4>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>Purchasing Type</span>
+                                <strong>{{ $stock->purchasing_from }}</strong>
+                            </div>
+                        </div>
+
+
+                        @if ($stock->purchasing_from == 'Local')
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Name</span>
+                                    <strong>{{ $stock->pushasing_from_name }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Phone</span>
+                                    <strong>{{ $stock->pushasing_from_phone }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>CNIC</span>
+                                    <strong>{{ $stock->pushasing_from_cnic }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="info-box">
+                                    <span>Address</span>
+                                    <strong>{{ $stock->pushasing_from_address }}</strong>
+                                </div>
+                            </div>
+                        @else
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Bussiness Name</span>
+                                    <strong>{{ $stock->dealer_bussiness }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Dealer Name</span>
+                                    <strong>{{ $stock->dealer_name }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Dealer Phone</span>
+                                    <strong>{{ $stock->dealer_phone }}</strong>
+                                </div>
+                            </div>
+                            @if ($stock->dealer_address)
+                                <div class="col-md-12">
+                                    <div class="info-box">
+                                        <span>Address</span>
+                                        <strong>{{ $stock->dealer_address ?? 'N/A' }}</strong>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+
+                {{-- ================= STOCK DETAILS ================= --}}
+                <div class="mb-5">
+
+                    <h4 class="fw-bold text-primary border-bottom pb-2 mb-4">
+                        <i class="bi bi-receipt me-2"></i>Stock Details
+                    </h4>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>Company</span>
+                                <strong>{{ $stock->company_name }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>Model</span>
+                                <strong>{{ $stock->model_name }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>ROM</span>
+                                <strong>{{ $stock->rom }}</strong>
+                            </div>
+                        </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>RAM</span>
+                                    <strong>{{ $stock->ram ?? 'N/A' }}</strong>
+                                </div>
+                            </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>IMEI 1</span>
+                                <strong>{{ $stock->imei1 }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>IMEI 2</span>
+                                <strong>{{ $stock->imei2 ?? 'N/A' }}</strong>
+
+                            </div>
+                        </div>
+
+                        @if ($stock->type === 'apple')
+                            <div class="col-md-12">
+                                <div class="info-box">
+                                    <span>Battery Health</span>
+                                    <strong>{{ $stock->health }}%</strong>
+                                </div>
+                            </div>
+                        @endif
+
+
+
+                        <div class="col-md-4">
+                             <div class="info-box">
+                                <span>PTA Status</span>
+                                <strong>{{ $stock->pta_status }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <span>Activation</span>
+                                <strong>{{ $stock->activation_status }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                             <div class="info-box">
+                                <span>Country</span>
+                                <strong>{{ $stock->country_status }}</strong>
+                            </div>
+                        </div>
+
+
+
+                        @if ($stock->status == 'Available')
+                      <div class="col-md-12">
+                             <div class="info-box">
+                                <span>Sale Price</span>
+                                <strong>{{'Rs.'. number_format($stock->sale) }}</strong>
+                            </div>
+                        </div>
+                    @endif
+
+                    </div>
+
+
+                </div>
+
+                {{-- ================= SOLD DETAILS ================= --}}
+                @if ($stock->status === 'Sold Out')
+                    <div>
+                        <h4 class="fw-bold text-primary border-bottom pb-2 mb-4">
+                            <i class="bi bi-receipt me-2"></i>Sold Details
+                        </h4>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Buyer Name</span>
+                                    <strong>{{ $stock->buyer_name }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Phone</span>
+                                    <strong>{{ $stock->buyer_phone ?? 'N/A' }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Sold Date</span>
+                                    <strong>{{ \Carbon\Carbon::parse($stock->sold_date)->format('d M Y') }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span>Backup Days</span>
+                                    <strong>{{ $stock->backup }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="info-box">
+                                    <span>Sold Price</span>
+                                    <strong>{{ 'Rs.' . number_format($stock->total_bill) }}</strong>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
                 @endif
-                @if ($stock->type == 'others')
-                    <li class="list-group-item"><span class="text-dark fw-bold">RAM</span> <span
-                            class="text-dark float-end">{{ $stock->ram }}</span></li>
-                @endif
-                <li class="list-group-item"><span class="text-dark fw-bold">ROM</span> <span
-                        class="text-dark float-end">{{ $stock->rom }}</span></li>
-                <li class="list-group-item"><span class="text-dark fw-bold">PTA Status</span> <span
-                        class="text-dark float-end">{{ $stock->pta_status }}</span></li>
-                <li class="list-group-item"><span class="text-dark fw-bold">Actication Status</span> <span
-                        class="text-dark float-end">{{ $stock->activation_status }}</span></li>
-                <li class="list-group-item"><span class="text-dark fw-bold">Country Status</span> <span
-                        class="text-dark float-end">{{ $stock->country_status }}</span></li>
-                <li class="list-group-item" style="font-size: 20px"><span class="text-dark fw-bolder">Sale
-                        Price</span> <span
-                        class="text-dark float-end">{{ 'Rs.' . number_format($stock->sale) }}</span>
-                </li>
-            </ul>
+
+            </div>
         </div>
+
+
+        <style>
+            .info-box {
+                background: #f8f9fa;
+                border: 1px solid #e4e6ef;
+                border-radius: 8px;
+                padding: 14px;
+            }
+
+            .info-box span {
+                display: block;
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+            .info-box strong {
+                font-size: 15px;
+                color: #212529;
+            }
+        </style>
+
+
     </div>
 
 

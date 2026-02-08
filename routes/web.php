@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\CashReceivedController;
 use App\Http\Controllers\CloseMonthController;
+use App\Http\Controllers\DealersController;
 use App\Http\Controllers\ExpensesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoicesController;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -281,6 +283,18 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/update/{id}', [CashReceivedController::class, 'update'])->name("update.cash");
             //index
             Route::get('/', [CashReceivedController::class, 'index'])->name("index.cash");
+        });
+
+           //dealers
+        Route::group(['prefix' => 'dealers'], function () {
+            //CRUD
+            Route::post('/submit', [DealersController::class, 'submit'])->name("submit.dealer");
+            Route::get('/create', [DealersController::class, 'create'])->name("create.dealer");
+            Route::get('/edit/{id}', [DealersController::class, 'edit'])->name("dealer.edit");
+            Route::post('/update/{id}', [DealersController::class, 'update'])->name("update.dealer");
+            Route::get('/delete/{id}', [DealersController::class, 'delete'])->name("dealer.delete");
+            //index
+            Route::get('/', [DealersController::class, 'index'])->name("index.dealer");
         });
 
 

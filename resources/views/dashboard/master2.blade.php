@@ -261,6 +261,17 @@
                     </li>
 
 
+                      <!-- Dealers -->
+                    <li class="menu-header small text-uppercase text-dark fw-bold"><span
+                            class="menu-header-text">Dealers</span></li>
+                    <li
+                        class="menu-item {{ Request::is('admin/dealers') || Request::is('admin/dealers/create') ? 'active' : '' }}">
+                        <a href="{{ url('admin/dealers') }}"
+                            class="menu-link {{ !(Request::is('admin/dealers') || Request::is('admin/dealers/create')) ? 'text-dark' : '' }}">
+                            <i class="menu-icon tf-icons bx bx-group"></i>
+                            <div data-i18n="Support">Dealers</div>
+                        </a>
+                    </li>
 
 
                   <!-- Device Info -->
@@ -501,7 +512,7 @@
 
                                 <div class="d-none d-lg-block">
                                     <a href="{{ url('/admin') }}" class="footer-link me-4">Dashboard</a>
-                                    <a href="{{ url('admin/invoices') }}" class="footer-link me-4">List Sale
+                                    <a href="{{ url('admin/invoices') }}" class="footer-link me-4">List
                                         Invoices</a>
 
                                     <a href="{{ url('admin/change-password') }}" class="footer-link me-4">Change

@@ -25,6 +25,13 @@ class Stocks extends Model
         'purchase',
         'sale',
         'created_at',
-        'updated_at'
+        'updated_at',
+
+        'pushasing_from_name',
+        'pushasing_from_phone',
+        'pushasing_from_cnic',
+        'pushasing_from_address',
+        'dealer_id',
+        'purchasing_from',
     ];
 }
