@@ -107,8 +107,21 @@ class StocksController extends Controller
                 'company_name'           => 'required',
                 'model_name'             => 'required',
                 'health'       => 'nullable|integer|min:1|max:100',
-                'purchase'       => 'required|integer|min:1',
-                'sale'       => 'required|integer|min:2',
+                'purchase' => 'required|integer|min:1',
+                'sale'     => 'required|integer|gte:purchase',
+                'purchasing_from'     => 'required|in:Local,Dealer',
+
+                'pushasing_from_phone' => [
+                    'nullable',
+                    'regex:/^03\d{2}-\d{7}$/'
+                ],
+
+                'pushasing_from_cnic' => [
+                    'nullable',
+                    'regex:/^\d{5}-\d{7}-\d{1}$/'
+                ],
+
+
                 'imei1' => [
                     'required',
                     'digits:15',
@@ -185,8 +198,18 @@ class StocksController extends Controller
                 'company_name'           => 'required',
                 'model_name'             => 'required',
                 'health'       => 'nullable|integer|min:1|max:100',
-                'purchase'       => 'required|integer|min:1',
-                'sale'       => 'required|integer|min:2',
+                'purchase' => 'required|integer|min:1',
+                'sale'     => 'required|integer|gte:purchase',
+                'purchasing_from'     => 'required|in:Local,Dealer',
+                'pushasing_from_phone' => [
+                    'nullable',
+                    'regex:/^03\d{2}-\d{7}$/'
+                ],
+
+                'pushasing_from_cnic' => [
+                    'nullable',
+                    'regex:/^\d{5}-\d{7}-\d{1}$/'
+                ],
                 'imei1' => [
                     'required',
                     'digits:15',
@@ -278,7 +301,10 @@ class StocksController extends Controller
             'stock_id' => 'required|exists:stocks,id',
             'sold_out_date' => 'required|date',
             'buyer_name' => 'required|string|max:255',
-            'buyer_phone' => 'nullable|string|max:20',
+            'buyer_phone' => [
+                    'nullable',
+                    'regex:/^03\d{2}-\d{7}$/'
+                ],
             'sale_price' => 'required|numeric|min:0',
         ]);
         $account = DB::table('accounts')->where('id', $request->account_id)->first();

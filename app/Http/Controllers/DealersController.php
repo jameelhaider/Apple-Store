@@ -58,6 +58,13 @@ class DealersController extends Controller
     public function submit(Request $request)
     {
         if (Gate::allows('is_admin')) {
+             $request->validate([
+            'phone' => [
+                    'required',
+                    'regex:/^03\d{2}-\d{7}$/'
+                ],
+        ]);
+
             $dealer = new Dealers();
             $dealer->name = $request->name;
             $dealer->phone = $request->phone;
@@ -76,6 +83,12 @@ class DealersController extends Controller
     public function update(Request $request, $id)
     {
         if (Gate::allows('is_admin')) {
+             $request->validate([
+            'phone' => [
+                    'required',
+                    'regex:/^03\d{2}-\d{7}$/'
+                ],
+        ]);
             $dealer = Dealers::find($id);
             $dealer->name = $request->name;
             $dealer->phone = $request->phone;

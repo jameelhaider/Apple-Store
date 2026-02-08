@@ -99,7 +99,7 @@
                 <div class="row">
                     @if (request()->type == 'apple')
                         <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
-                            <select name="model_name" id="" class="form-select" onchange="this.form.submit()">
+                            <select name="model_name" id="model-select" class="form-select" onchange="this.form.submit()">
                                 <option value="{{ null }}">Select Model</option>
                                 @foreach (iphone_models() as $model)
                                     <option value="{{ $model }}"
@@ -110,7 +110,8 @@
                         </div>
                     @else
                         <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
-                            <select name="company_name" id="" class="form-select" onchange="this.form.submit()">
+                            <select name="company_name" id="company-select" class="form-select"
+                                onchange="this.form.submit()">
                                 <option value="{{ null }}">Select Company</option>
                                 @foreach (other_companies() as $company)
                                     <option value="{{ $company }}"
@@ -216,7 +217,7 @@
                                     @endif
 
                                     <td class="text-dark fw-bold" title="View Details" style="font-size: 16px;">
-                                        <a href="{{ route('stock.view',['id'=>$stock->id]) }}">
+                                        <a href="{{ route('stock.view', ['id' => $stock->id]) }}">
                                             {{ $stock->model_name }}
                                         </a>
 
@@ -381,11 +382,11 @@
                                     <select name="account_id" required class="form-select" id="accountSelect">
                                         <option value="">Select Account</option>
                                         @foreach ($accounts as $account)
-                                         <option value="{{ $account->id }}"
-            data-name="{{ $account->customer_name }}"
-            data-phone="{{ $account->customer_phone }}">
-            {{ $account->customer_name }}
-        </option>
+                                            <option value="{{ $account->id }}"
+                                                data-name="{{ $account->customer_name }}"
+                                                data-phone="{{ $account->customer_phone }}">
+                                                {{ $account->customer_name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -441,8 +442,15 @@
                                     <label class="fw-bold text-dark mb-1">
                                         Buyer Phone (optional)
                                     </label>
-                                    <input type="text" class="form-control" maxlength="12"
-                                        placeholder="0399-99999999" id="buyerPhone" name="buyer_phone">
+
+                                    <input type="text" maxlength="12" placeholder="0399-99999999"
+                                        data-inputmask="'mask': '0399-99999999'" class="form-control @error('buyer_phone') is-invalid @enderror" name="buyer_phone"
+                                        id="buyerPhone">
+                                        @error('buyer_phone')
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                        @enderror
+
+
                                 </div>
                             </div>
                         </div>
@@ -486,7 +494,7 @@
                                 <div class="form-group">
                                     <label for="buyerName" class="fw-bold text-dark mb-1">Backup Days <span
                                             class="text-danger">*</span></label>
-                                    <select name="backup" required class="form-select" id="">
+                                    <select name="backup" required class="form-select">
                                         <option value="">Select Backup</option>
                                         <option value="1 Day">1 Day</option>
                                         <option value="2 Days">2 Days</option>
@@ -518,6 +526,10 @@
         </div>
     </div>
 
+
+    <script>
+        $(":input").inputmask();
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -530,5 +542,50 @@
         function handleModalClose() {
             $('#markAsSoldModal').modal('hide');
         }
+    </script>
+
+
+
+    <style>
+        .select2-container--default .select2-selection--single {
+            display: block;
+            width: 100%;
+            padding: 0.300rem 0.200rem 0.300rem 0.200rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            height: auto;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 50%;
+            right: 0.32rem;
+            transform: translateY(-50%);
+            height: auto;
+        }
+    </style>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+    <script>
+        $('#model-select').select2({
+            placeholder: 'Select Model',
+            allowClear: true
+        });
+        $('#acc-select').select2({
+            placeholder: 'Select Accounr',
+            allowClear: true
+        });
+        $('#company-select').select2({
+            placeholder: 'Select Company',
+            allowClear: true
+        });
     </script>
 @endsection

@@ -53,8 +53,13 @@
                             name="name">
                     </div>
                     <div class="col-lg-5 col-md-4 col-sm-4 col-6 mt-1 mb-1">
-                        <input type="text" class="form-control" value="{{ request()->phone }}" placeholder="Phone"
-                            name="phone">
+
+                            <input type="text" value="{{ request()->phone }}"
+                            name="phone" placeholder="0300-0000000"
+                            class="form-control"
+                            data-inputmask="'mask': '0399-9999999'" type="number" maxlength = "12">
+
+
                     </div>
                     <div class="col-lg-2 col-md-4 col-sm-4 col-12 mt-1 mb-1">
                         <div class="btn-group w-100">
@@ -165,7 +170,9 @@
 
     </div>
 
-
+  <script>
+        $(":input").inputmask();
+    </script>
 
 
     <script>

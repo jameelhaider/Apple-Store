@@ -177,7 +177,7 @@
 
                 <div class="row mt-3">
                     <hr>
-                    <h4 class="fw-bold mb-3">Stock Information</h4>
+                    <h4 class="fw-bold text-dark mb-3">Stock Information</h4>
                     <hr>
                 </div>
 
@@ -192,7 +192,7 @@
 
 
 
-                            <select name="model_name" class="form-select @error('model_name') is-invalid @enderror">
+                            <select name="model_name" id="model-select" required class="form-select @error('model_name') is-invalid @enderror">
                                 <option value="">Select iPhone Model</option>
 
                                 @foreach (iphone_models() as $model)
@@ -223,9 +223,7 @@
                             <label for="" class="fw-bold mb-2 text-dark">SELECT COMPANY<span
                                     class="text-danger">*</span></label>
 
-
-
-                            <select name="company_name" required
+                            <select name="company_name" id="company-select" required
                                 class="form-select @error('company_name') is-invalid @enderror">
                                 <option value="">Select Company</option>
 
@@ -300,7 +298,7 @@
 
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">ROM<span class="text-danger">*</span></label>
-                        <select name="rom" required class="form-select @error('rom') is-invalid @enderror">
+                        <select name="rom" required id="rom-select" class="form-select @error('rom') is-invalid @enderror">
                             <option value="">Select Option</option>
                             <option value="1 GB" {{ old('rom', $stock->rom) == '1 GB' ? 'selected' : '' }}>1 GB</option>
                             <option value="2 GB" {{ old('rom', $stock->rom) == '2 GB' ? 'selected' : '' }}>2 GB</option>
@@ -345,7 +343,7 @@
                     @else
                         <div class="col-lg-4 col-md-4 col-6">
                             <label class="fw-bold mb-2 text-dark">RAM<span class="text-danger">*</span></label>
-                            <select name="ram" required class="form-select @error('ram') is-invalid @enderror">
+                            <select name="ram" required id="ram-select" class="form-select @error('ram') is-invalid @enderror">
                                 <option value="">Select Option</option>
                                 <option value="128 MB" {{ old('ram', $stock->ram) == '128 MB' ? 'selected' : '' }}>128 MB
                                 </option>
@@ -526,6 +524,10 @@
     </div>
 
 
+    <script>
+        $(":input").inputmask();
+    </script>
+
     <style>
         .select2-container--default .select2-selection--single {
             display: block;
@@ -551,55 +553,34 @@
         }
     </style>
 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
     <script>
-        $(":input").inputmask();
+        $('#model-select').select2({
+            placeholder: 'Select Model',
+            allowClear: true
+        });
+         $('#company-select').select2({
+            placeholder: 'Select Company',
+            allowClear: true
+        });
+        $('#ram-select').select2({
+            placeholder: 'Select Ram',
+            allowClear: true
+        });
+        $('#rom-select').select2({
+            placeholder: 'Select Rom',
+            allowClear: true
+        });
     </script>
+
+
 
 
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            function populateModels(companyId, selectedModelId = null) {
-                if (companyId) {
-                    $.ajax({
-                        url: '/company/' + companyId + '/models',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(data) {
-                            $('#model-select').empty();
-                            $('#model-select').append('<option value="">Select Model</option>');
-
-                            $.each(data, function(index, model) {
-                                let selected = (model.id == selectedModelId) ? 'selected' : '';
-                                $('#model-select').append('<option value="' + model.id + '" ' +
-                                    selected + '>' + model.model + '</option>');
-                            });
-                        },
-                        error: function() {
-                            alert('Error fetching models. Please try again.');
-                        }
-                    });
-                } else {
-                    $('#model-select').empty();
-                    $('#model-select').append('<option value="">Select Model</option>');
-                }
-            }
-
-            $('#company-select').on('change', function() {
-                var companyId = $(this).val();
-                populateModels(companyId);
-            });
-
-            // Initial population on page load for edit
-            var initialCompanyId = $('#company-select').val();
-            var initialModelId = '{{ old('model_id', $stock->model_id ?? '') }}';
-            if (initialCompanyId) {
-                populateModels(initialCompanyId, initialModelId);
-            }
-        });
-    </script>
 
 
 

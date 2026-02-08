@@ -74,8 +74,13 @@
 
                     <div class="col-lg-4 col-md-4">
                         <label for="" class="fw-bold mb-2 text-dark">Phone<span class="text-danger">*</span></label>
-                        <input type="text" required maxlength="11" placeholder="Phone" value="{{ $dealer->phone }}"
-                            class="form-control @error('phone') is-invalid @enderror" name="phone">
+
+                            <input type="text" required value="{{ old('phone', $dealer->phone) }}"
+                            name="phone" placeholder="0300-0000000"
+                            class="form-control @error('phone') is-invalid @enderror"
+                            data-inputmask="'mask': '0399-9999999'" type="number" maxlength = "12">
+
+
                         @error('phone')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -123,4 +128,7 @@
             </form>
         </div>
     </div>
+      <script>
+        $(":input").inputmask();
+    </script>
 @endsection
