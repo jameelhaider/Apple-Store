@@ -158,7 +158,7 @@
 
                         {{-- Address --}}
                         <div class="col-lg-4 col-md-4 mt-3">
-                            <label class="fw-bold mb-2 text-dark">ADDRESS<span class="text-danger">*</span></label>
+                            <label class="fw-bold mb-2 text-dark">ADDRESS (Optional)</label>
                             <textarea name="pushasing_from_address" placeholder="Address"
                                 class="form-control @error('pushasing_from_address') is-invalid @enderror" id="address-field" cols="30"
                                 rows="3">{{ old('pushasing_from_address', $stock->pushasing_from_address) }}</textarea>
@@ -297,7 +297,7 @@
 
 
                     <div class="col-lg-4 col-md-4 col-6">
-                        <label class="fw-bold mb-2 text-dark">ROM<span class="text-danger">*</span></label>
+                        <label class="fw-bold mb-2 text-dark">Storage / ROM<span class="text-danger">*</span></label>
                         <select name="rom" required id="rom-select" class="form-select @error('rom') is-invalid @enderror">
                             <option value="">Select Option</option>
                             <option value="1 GB" {{ old('rom', $stock->rom) == '1 GB' ? 'selected' : '' }}>1 GB</option>
@@ -570,7 +570,7 @@
             allowClear: true
         });
         $('#rom-select').select2({
-            placeholder: 'Select Rom',
+            placeholder: 'Select Storage / Rom',
             allowClear: true
         });
     </script>
@@ -604,7 +604,7 @@
                 nameField.setAttribute('required', 'required');
                 phoneField.setAttribute('required', 'required');
                 cnicField.setAttribute('required', 'required');
-                addressField.setAttribute('required', 'required');
+                // addressField.setAttribute('required', 'required');
                 DealerSelect.removeAttribute('required');
             } else if (value === 'Dealer') {
                 sellerInfo.style.display = 'none';

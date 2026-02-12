@@ -89,7 +89,7 @@
                             <div class="col-md-12">
                                 <div class="info-box">
                                     <span>Address</span>
-                                    <strong>{{ $stock->pushasing_from_address }}</strong>
+                                    <strong>{{ $stock->pushasing_from_address ?? 'N/A' }}</strong>
                                 </div>
                             </div>
                         @else
@@ -147,7 +147,7 @@
 
                         <div class="col-md-6">
                             <div class="info-box">
-                                <span>ROM</span>
+                                <span>Storage / ROM</span>
                                 <strong>{{ $stock->rom }}</strong>
                             </div>
                         </div>

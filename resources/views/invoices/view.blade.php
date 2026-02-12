@@ -252,7 +252,7 @@
                                     <li class="list-group-item"><span class="text-dark fw-bold">RAM</span> <span
                                             class="text-dark float-end">{{ $invoice->ram }}</span></li>
                                 @endif
-                                <li class="list-group-item"><span class="text-dark fw-bold">ROM</span> <span
+                                <li class="list-group-item"><span class="text-dark fw-bold">Storage / ROM</span> <span
                                         class="text-dark float-end">{{ $invoice->rom }}</span></li>
                                 <li class="list-group-item"><span class="text-dark fw-bold">PTA Status</span> <span
                                         class="text-dark float-end">{{ $invoice->pta_status }}</span></li>
