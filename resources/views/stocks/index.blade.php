@@ -130,7 +130,7 @@
 
                     <div class="col-lg-3 col-md-3 col-sm-6 col-6 mt-1 mb-1">
                         <select name="pta_status" class="form-control" onchange="this.form.submit()" id="">
-                            <option value="">PTA Status</option>
+                            <option value="">PTA Status (All)</option>
                             <option value="Official Approved"
                                 {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>Official Approved
                             </option>
@@ -220,6 +220,13 @@
                                         <a href="{{ route('stock.view', ['id' => $stock->id]) }}">
                                             {{ $stock->model_name }}
                                         </a>
+                                        @if ($stock->pta_status=='Official Approved')
+<p style="color: rgb(1, 149, 1);font-size:12px;">Official Approved</p>
+@elseif ($stock->pta_status=='Not Approved')
+<p style="color: rgb(253, 27, 27);font-size:12px;">Not Approved</p>
+@else
+<p style="color: rgb(255, 128, 0);font-size:12px;">{{ $stock->pta_status }}</p>
+                                        @endif
 
                                     </td>
 
