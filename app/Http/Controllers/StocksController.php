@@ -156,10 +156,10 @@ class StocksController extends Controller
             }
 
             if ($request->purchasing_from == 'Local') {
-                $stock->pushasing_from_name = $request->pushasing_from_name;
+                $stock->pushasing_from_name = strtoupper($request->pushasing_from_name);
                 $stock->pushasing_from_phone = $request->pushasing_from_phone;
                 $stock->pushasing_from_cnic = $request->pushasing_from_cnic;
-                $stock->pushasing_from_address = $request->pushasing_from_address;
+                $stock->pushasing_from_address = strtoupper($request->pushasing_from_address);
                 $stock->dealer_id = null;
             } elseif ($request->purchasing_from == 'Dealer') {
                 $stock->pushasing_from_name = null;
@@ -246,10 +246,10 @@ class StocksController extends Controller
             }
 
             if ($request->purchasing_from == 'Local') {
-                $stock->pushasing_from_name = $request->pushasing_from_name;
+                $stock->pushasing_from_name = strtoupper($request->pushasing_from_name);
                 $stock->pushasing_from_phone = $request->pushasing_from_phone;
                 $stock->pushasing_from_cnic = $request->pushasing_from_cnic;
-                $stock->pushasing_from_address = $request->pushasing_from_address;
+                $stock->pushasing_from_address = strtoupper($request->pushasing_from_address);
                 $stock->dealer_id = null;
             } elseif ($request->purchasing_from == 'Dealer') {
                 $stock->pushasing_from_name = null;
@@ -316,7 +316,7 @@ class StocksController extends Controller
             'profit'      => $profit,
             'sold_date'   => $request->sold_out_date,
             'total_bill'   => $request->sale_price,
-            'buyer_name'  => $request->buyer_name,
+            'buyer_name'  => strtoupper($request->buyer_name),
             'buyer_phone' => $request->buyer_phone,
             'backup' => $request->backup,
             'account_id' => $request->account_id,

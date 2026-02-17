@@ -66,10 +66,10 @@ class DealersController extends Controller
         ]);
 
             $dealer = new Dealers();
-            $dealer->name = $request->name;
+            $dealer->name = strtoupper($request->name);
             $dealer->phone = $request->phone;
-            $dealer->bussiness_name = $request->bussiness_name;
-            $dealer->address = $request->address;
+            $dealer->bussiness_name = strtoupper($request->bussiness_name);
+            $dealer->address = strtoupper($request->address);
             $dealer->save();
             return redirect()->route('index.dealer')->with('success', 'Dealer Created Successfully!');
         } else {
@@ -90,10 +90,10 @@ class DealersController extends Controller
                 ],
         ]);
             $dealer = Dealers::find($id);
-            $dealer->name = $request->name;
+            $dealer->name = strtoupper($request->name);
             $dealer->phone = $request->phone;
-            $dealer->bussiness_name = $request->bussiness_name;
-            $dealer->address = $request->address;
+            $dealer->bussiness_name = strtoupper($request->bussiness_name);
+            $dealer->address = strtoupper($request->address);
             $dealer->update();
             return redirect()->route('index.dealer')->with('success', 'Dealer Updated SUccessfully!');
         } else {

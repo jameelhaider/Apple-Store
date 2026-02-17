@@ -86,12 +86,15 @@
                                     <strong>{{ $stock->pushasing_from_cnic }}</strong>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <div class="info-box">
-                                    <span>Address</span>
-                                    <strong>{{ $stock->pushasing_from_address ?? 'N/A' }}</strong>
+
+                            @if ($stock->pushasing_from_address)
+                                <div class="col-md-12">
+                                    <div class="info-box">
+                                        <span>Address</span>
+                                        <strong>{{ $stock->pushasing_from_address ?? 'N/A' }}</strong>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         @else
                             <div class="col-md-6">
                                 <div class="info-box">
@@ -152,12 +155,12 @@
                             </div>
                         </div>
 
-                            <div class="col-md-6">
-                                <div class="info-box">
-                                    <span>RAM</span>
-                                    <strong>{{ $stock->ram ?? 'N/A' }}</strong>
-                                </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span>RAM</span>
+                                <strong>{{ $stock->ram ?? 'N/A' }}</strong>
                             </div>
+                        </div>
 
                         <div class="col-md-6">
                             <div class="info-box">
@@ -186,7 +189,7 @@
 
 
                         <div class="col-md-4">
-                             <div class="info-box">
+                            <div class="info-box">
                                 <span>PTA Status</span>
                                 <strong>{{ $stock->pta_status }}</strong>
                             </div>
@@ -200,7 +203,7 @@
                         </div>
 
                         <div class="col-md-4">
-                             <div class="info-box">
+                            <div class="info-box">
                                 <span>Country Lock Status</span>
                                 <strong>{{ $stock->country_status }}</strong>
                             </div>
@@ -209,13 +212,13 @@
 
 
                         @if ($stock->status == 'Available')
-                      <div class="col-md-12">
-                             <div class="info-box">
-                                <span>Sale Price</span>
-                                <strong>{{'Rs.'. number_format($stock->sale) }}</strong>
+                            <div class="col-md-12">
+                                <div class="info-box">
+                                    <span>Sale Price</span>
+                                    <strong>{{ 'Rs.' . number_format($stock->sale) }}</strong>
+                                </div>
                             </div>
-                        </div>
-                    @endif
+                        @endif
 
                     </div>
 
