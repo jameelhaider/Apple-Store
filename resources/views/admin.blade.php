@@ -122,7 +122,7 @@
 
 
 
-         <h2 class="fw-bold text-center text-dark">Total Cash Remainings To Receive</h2>
+        <h2 class="fw-bold text-center text-dark">Total Cash Remainings To Receive</h2>
         <div class="row justify-content-around">
             <div class="col-lg-12 col-12 col-md-12 mb-4">
                 <div class="card">
@@ -423,6 +423,63 @@
 
 
 
+        <h2 class="fw-bold text-center text-dark mt-5">Available iPhone Stock Summary</h2>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bx bx-mobile"></i> iPhone Stock Table
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover text-center mb-0">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th style="font-size:12px" class="text-dark fw-bold">#</th>
+                                        <th style="font-size:12px" class="text-dark fw-bold">Model Name</th>
+                                        <th style="font-size:12px" class="text-dark fw-bold">Total iPhones</th>
+                                        <th style="font-size:12px" class="text-dark fw-bold">Official Approved</th>
+                                        <th style="font-size:12px" class="text-dark fw-bold">Not Approved</th>
+                                        <th style="font-size:12px" class="text-dark fw-bold">4 Months Remaining</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($iphonedata as $index => $iphone)
+                                        <tr>
+                                            <td class="text-dark">{{ $index + 1 }}</td>
+                                            <td class="fw-bold text-dark">{{ $iphone->model_name }}</td>
+                                            <td>{{ $iphone->total_iphone }}</td>
+                                            <td class="fw-bold" style="color: rgb(1, 149, 1);">
+                                                {{ $iphone->total_approved }}
+                                            </td>
+                                            <td class="fw-bold" style="color: rgb(253, 27, 27);">
+                                                {{ $iphone->total_not_approved }}
+                                            </td>
+                                            <td class="fw-bold" style="color: rgb(255, 128, 0);">
+                                                {{ $iphone->total_four_rem }}
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-muted">
+                                                No iPhone stock available
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+
 
     </div>
 
@@ -560,7 +617,6 @@
                 }
             }
         });
-
     </script>
 
 

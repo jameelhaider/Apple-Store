@@ -147,6 +147,21 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/', function () {
             if (Gate::allows('is_admin')) {
+                $iphonedata = DB::table('stocks')
+                    ->select(
+                        'model_name',
+                        DB::raw('COUNT(*) as total_iphone'),
+                        DB::raw("SUM(CASE WHEN pta_status = 'Official Approved' THEN 1 ELSE 0 END) as total_approved"),
+                        DB::raw("SUM(CASE WHEN pta_status = 'Not Approved' THEN 1 ELSE 0 END) as total_not_approved"),
+                        DB::raw("SUM(CASE WHEN pta_status = 'Not Approved (4 months remaining)' THEN 1 ELSE 0 END) as total_four_rem")
+                    )
+                    ->where('status', 'Available')
+                    ->where('type', 'apple')
+                    ->groupBy('model_name')
+                    ->get();
+
+
+
                 // Revenues
                 $today = Carbon::today();
                 $startOfWeek = Carbon::now()->startOfWeek();
@@ -199,7 +214,7 @@ Route::middleware(['auth'])->group(function () {
                     ->sum('total_bill');
                 $totaloverallsales = DB::table('invoices')
                     ->sum('total_bill');
-                    $totalrem = DB::table('accounts')
+                $totalrem = DB::table('accounts')
                     ->where('prev_balance', '>', 0)
                     ->sum('prev_balance');
                 return view('admin', compact(
@@ -207,6 +222,7 @@ Route::middleware(['auth'])->group(function () {
                     'thisWeekRevenue',
                     'thisYearRevenue',
                     'overallRevenue',
+                    'iphonedata',
                     'thisMonthRevenue',
                     'totalExpensesthismonth',
                     'previousMonthRevenue',
@@ -257,7 +273,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
 
-          //accounts
+        //accounts
         Route::group(['prefix' => 'accounts'], function () {
             //CRUD
             Route::post('/submit', [AccountsController::class, 'submit'])->name("submit.account");
@@ -272,7 +288,7 @@ Route::middleware(['auth'])->group(function () {
         });
 
 
-           //cash received
+        //cash received
         Route::group(['prefix' => 'cash-received'], function () {
             //CRUD
             Route::post('/submit', [CashReceivedController::class, 'submit'])->name("submit.cash");
@@ -285,7 +301,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/', [CashReceivedController::class, 'index'])->name("index.cash");
         });
 
-           //dealers
+        //dealers
         Route::group(['prefix' => 'dealers'], function () {
             //CRUD
             Route::post('/submit', [DealersController::class, 'submit'])->name("submit.dealer");
