@@ -241,8 +241,11 @@
                                         class="text-dark float-end">{{ $invoice->model_name }}</span></li>
                                 <li class="list-group-item"><span class="text-dark fw-bold">IMEI 1</span> <span
                                         class="text-dark float-end">{{ $invoice->imei1 }}</span></li>
-                                <li class="list-group-item"><span class="text-dark fw-bold">IMEI 2</span> <span
+                                        @if ($invoice->imei2)
+<li class="list-group-item"><span class="text-dark fw-bold">IMEI 2</span> <span
                                         class="text-dark float-end">{{ $invoice->imei2 }}</span></li>
+                                        @endif
+
 
                                 @if ($invoice->type == 'apple')
                                     <li class="list-group-item"><span class="text-dark fw-bold">Battery Health</span> <span
