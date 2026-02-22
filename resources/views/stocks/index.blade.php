@@ -140,6 +140,9 @@
                                 <option value="Not Approved (4 months remaining)"
                                     {{ request()->pta_status == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
                                     Not Approved (4 months remaining)</option>
+                                <option value="Not Approved (2 months remaining)"
+                                    {{ request()->pta_status == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
+                                    Not Approved (2 months remaining)</option>
                             @endif
 
 
@@ -220,12 +223,12 @@
                                         <a href="{{ route('stock.view', ['id' => $stock->id]) }}">
                                             {{ $stock->model_name }}
                                         </a>
-                                        @if ($stock->pta_status=='Official Approved')
-<p style="color: rgb(1, 149, 1);font-size:12px;">Official Approved</p>
-@elseif ($stock->pta_status=='Not Approved')
-<p style="color: rgb(253, 27, 27);font-size:12px;">Not Approved</p>
-@else
-<p style="color: rgb(255, 128, 0);font-size:12px;">{{ $stock->pta_status }}</p>
+                                        @if ($stock->pta_status == 'Official Approved')
+                                            <p style="color: rgb(1, 149, 1);font-size:12px;">Official Approved</p>
+                                        @elseif ($stock->pta_status == 'Not Approved')
+                                            <p style="color: rgb(253, 27, 27);font-size:12px;">Not Approved</p>
+                                        @else
+                                            <p style="color: rgb(255, 128, 0);font-size:12px;">{{ $stock->pta_status }}</p>
                                         @endif
 
                                     </td>
@@ -451,11 +454,13 @@
                                     </label>
 
                                     <input type="text" maxlength="12" placeholder="0399-99999999"
-                                        data-inputmask="'mask': '0399-99999999'" class="form-control @error('buyer_phone') is-invalid @enderror" name="buyer_phone"
+                                        data-inputmask="'mask': '0399-99999999'"
+                                        class="form-control @error('buyer_phone') is-invalid @enderror" name="buyer_phone"
                                         id="buyerPhone">
-                                        @error('buyer_phone')
-                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-                        @enderror
+                                    @error('buyer_phone')
+                                        <span class="invalid-feedback"
+                                            role="alert"><strong>{{ $message }}</strong></span>
+                                    @enderror
 
 
                                 </div>

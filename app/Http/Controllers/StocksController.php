@@ -140,7 +140,7 @@ class StocksController extends Controller
                         }
                     },
                 ],
-                'pta_status'           => 'required|in:Official Approved,Not Approved,Not Approved (4 months remaining),Patch Approved,CPID Approved',
+                'pta_status'           => 'required|in:Official Approved,Not Approved,Not Approved (4 months remaining),Not Approved (2 months remaining),Patch Approved,CPID Approved',
                 'ram'                  => 'nullable|string|max:20',
                 'rom'                  => 'required|string|max:20',
                 'activation_status'         => 'required|in:Active,Non Active',
@@ -228,7 +228,7 @@ class StocksController extends Controller
                         }
                     },
                 ],
-                'pta_status'           => 'required|in:Official Approved,Not Approved,Not Approved (4 months remaining),Patch Approved,CPID Approved',
+                'pta_status'           => 'required|in:Official Approved,Not Approved,Not Approved (4 months remaining),Not Approved (2 months remaining),Patch Approved,CPID Approved',
                 'ram'                  => 'nullable|string|max:20',
                 'rom'                  => 'required|string|max:20',
                 'activation_status'         => 'required|in:Active,Non Active',

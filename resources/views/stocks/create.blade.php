@@ -331,7 +331,7 @@
                         <div class="col-lg-4 col-md-4 col-6">
                             <label for="" class="fw-bold mb-2 text-dark">BATTERY HEALTH<span
                                     class="text-danger">*</span></label>
-                            <input type="number" min="1" max="100" placeholder="Battery Health"
+                            <input type="number" required min="1" max="100" placeholder="Battery Health"
                                 name="health" value="{{ old('health', $stock->health) }}"
                                 class="form-control @error('health') is-invalid @enderror">
                             @error('health')
@@ -405,6 +405,9 @@
                                 <option value="Not Approved (4 months remaining)"
                                     {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
                                     Not Approved (4 months remaining)</option>
+                                    <option value="Not Approved (4 months remaining)"
+                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
+                                    Not Approved (2 months remaining)</option>
                             @endif
 
                             @if (request()->type == 'others')
