@@ -153,7 +153,8 @@ Route::middleware(['auth'])->group(function () {
                         DB::raw('COUNT(*) as total_iphone'),
                         DB::raw("SUM(CASE WHEN pta_status = 'Official Approved' THEN 1 ELSE 0 END) as total_approved"),
                         DB::raw("SUM(CASE WHEN pta_status = 'Not Approved' THEN 1 ELSE 0 END) as total_not_approved"),
-                        DB::raw("SUM(CASE WHEN pta_status = 'Not Approved (4 months remaining)' THEN 1 ELSE 0 END) as total_four_rem")
+                        DB::raw("SUM(CASE WHEN pta_status = 'Not Approved (4 months remaining)' THEN 1 ELSE 0 END) as total_four_rem"),
+                        DB::raw("SUM(CASE WHEN pta_status = 'Not Approved (2 months remaining)' THEN 1 ELSE 0 END) as total_two_rem")
                     )
                     ->where('status', 'Available')
                     ->where('type', 'apple')

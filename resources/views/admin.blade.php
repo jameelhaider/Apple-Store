@@ -443,6 +443,7 @@
                                         <th style="font-size:12px" class="text-dark fw-bold">Official Approved</th>
                                         <th style="font-size:12px" class="text-dark fw-bold">Not Approved</th>
                                         <th style="font-size:12px" class="text-dark fw-bold">4 Months Remaining</th>
+                                        <th style="font-size:12px" class="text-dark fw-bold">2 Months Remaining</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -459,6 +460,9 @@
                                             </td>
                                             <td class="fw-bold" style="color: rgb(255, 128, 0);">
                                                 {{ $iphone->total_four_rem }}
+                                            </td>
+                                             <td class="fw-bold" style="color: rgb(255, 128, 0);">
+                                                {{ $iphone->total_two_rem }}
                                             </td>
                                         </tr>
                                     @empty
