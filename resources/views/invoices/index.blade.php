@@ -100,33 +100,114 @@
                         <input type="date" class="form-control" value="{{ request()->date }}" name="date">
                     </div>
                     <div class="col-lg-3 col-md-4 col-sm-4 mt-1 mb-1">
-                        <div class="btn-group w-100">
-                            <a href="{{ url('admin/invoices') }}" title="Clear" class="btn btn-outline-danger">Clear</a>
-                            <button type="submit" title="Search" class="btn btn-outline-success">Search</button>
-                            <style>
-                                .btn-outline-success:hover {
-                                    background-color: #89c72d;
-                                }
+                        <div class="btn-group w-100" role="group">
+                            <a href="{{ url('admin/invoices') }}" title="Clear" class="btn btn-outline-danger">
+                                Clear
+                            </a>
 
-                                .btn-outline-danger:hover {
-                                    background-color: #ef6347;
-                                }
-                            </style>
+                            <button type="submit" title="Search" class="btn btn-outline-success">
+                                Search
+                            </button>
 
+                            <button type="button" title="Filters" class="btn btn-outline-secondary"
+                                data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas"
+                                aria-controls="filtersOffcanvas">
+                                Filters
+                            </button>
                         </div>
                     </div>
+
+
+
+
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="filtersOffcanvas"
+                        aria-labelledby="filtersOffcanvasLabel">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="filtersOffcanvasLabel">
+                                More Filters
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                        </div>
+
+                        <div class="offcanvas-body">
+
+                            <div class="mb-3">
+                                <label class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Name"
+                                    value="{{ request()->customer_name }}" name="customer_name">
+                            </div>
+
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Name"
+                                    value="{{ request()->customer_name }}" name="customer_name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Customer Phone</label>
+
+                                <input type="text" maxlength="12" placeholder="0399-99999999"
+                                    data-inputmask="'mask': '0399-99999999'" value="{{ request()->customer_phone }}"
+                                    class="form-control" name="customer_phone">
+
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Sold Month</label>
+                                <input type="month" class="form-control" value="{{ request()->sold_month }}"
+                                    name="sold_month">
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-outline-success w-100">
+                                    Apply Filters
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary w-100" data-bs-dismiss="offcanvas">
+                                    Cancel
+                                </button>
+                            </div>
+                            <a href="{{ url('/admin/invoices') }}" class="btn btn-outline-danger w-100 mt-2" >Clear Filters</a>
+                        </div>
+                    </div>
+
+
+                    <style>
+                        .btn-outline-success:hover {
+                            background-color: #89c72d;
+                        }
+
+                        .btn-outline-danger:hover {
+                            background-color: #ef6347;
+                        }
+                    </style>
                 </div>
             </form>
         </div>
 
 
-        @if ($invoices->count() > 0 && (request()->invoice_id || request()->date || request()->account_id))
+        @if (
+            $invoices->count() > 0 &&
+                (request()->invoice_id ||
+                    request()->date ||
+                    request()->account_id ||
+                    request()->customer_name ||
+                    request()->customer_phone ||
+                    request()->sold_month))
             <div class="alert bg-primary text-white mt-3">
                 <strong>{{ $invoices->count() }}
                     {{ $invoices->count() > 0 && $invoices->count() < 2 ? 'Result' : 'Results' }}
                     Found</strong>
             </div>
-        @elseif ($invoices->count() < 1 && (request()->invoice_id || request()->date || request()->account_id))
+        @elseif (
+            $invoices->count() < 1 &&
+                (request()->invoice_id ||
+                    request()->date ||
+                    request()->account_id ||
+                    request()->customer_name ||
+                    request()->customer_phone ||
+                    request()->sold_month))
             <div class="alert bg-warning text-white mt-3">
                 <strong>No Results Found !</strong>
             </div>
@@ -215,7 +296,7 @@
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item"
-                                                        href="{{ route('stock.view',['id'=>$invoice->stock_id]) }}">View
+                                                        href="{{ route('stock.view', ['id' => $invoice->stock_id]) }}">View
                                                         Details</a>
                                                 </li>
 
@@ -286,6 +367,10 @@
 
     </div>
 
+
+    <script>
+        $(":input").inputmask();
+    </script>
 
     <script>
         // Function to handle delete confirmation

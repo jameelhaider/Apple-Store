@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Invoices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,15 +32,28 @@ class InvoicesController extends Controller
         if ($request->filled('invoice_no')) {
             $query->where('invoices.id', $request->invoice_no);
         }
+        if ($request->filled('customer_phone')) {
+            $query->where('invoices.buyer_phone', $request->customer_phone);
+        }
+        if ($request->filled('customer_name')) {
+            $query->where('invoices.buyer_name', 'LIKE', '%' . $request->customer_name . '%');
+        }
         if ($request->filled('date')) {
-            $query->whereDate('invoices.sold_date', $request->date);
+            $query->whereDate('invoices.sold_date', '=', $request->date);
+        }
+
+        if ($request->filled('sold_month')) {
+            [$year, $month] = explode('-', $request->sold_month);
+
+            $query->whereYear('invoices.sold_date', $year)
+                ->whereMonth('invoices.sold_date', $month);
         }
 
         $invoices = $query
             ->orderBy('invoices.created_at', 'desc')
             ->paginate(500);
-            $accounts=DB::table('accounts')->get();
-        return view('invoices.index', compact('invoices','accounts'));
+        $accounts = DB::table('accounts')->get();
+        return view('invoices.index', compact('invoices', 'accounts'));
     }
 
 
@@ -52,7 +66,7 @@ class InvoicesController extends Controller
         if (Gate::allows('is_admin')) {
             $invoice = DB::table('invoices')
                 ->join('stocks', 'invoices.stock_id', 'stocks.id')
-                ->select('stocks.company_name','stocks.model_name','stocks.health','stocks.activation_status','stocks.pta_status','stocks.imei1','stocks.imei2','stocks.country_status','stocks.ram','stocks.rom','stocks.type','invoices.id','invoices.invoice_id','invoices.buyer_name','invoices.buyer_phone','invoices.backup','invoices.sold_date','invoices.total_bill','invoices.created_at')
+                ->select('stocks.company_name', 'stocks.model_name', 'stocks.health', 'stocks.activation_status', 'stocks.pta_status', 'stocks.imei1', 'stocks.imei2', 'stocks.country_status', 'stocks.ram', 'stocks.rom', 'stocks.type', 'invoices.id', 'invoices.invoice_id', 'invoices.buyer_name', 'invoices.buyer_phone', 'invoices.backup', 'invoices.sold_date', 'invoices.total_bill', 'invoices.created_at')
                 ->where('invoices.id', $id)
                 ->first();
             return view('invoices.view', compact('invoice'));
