@@ -398,19 +398,7 @@
                                 {{ old('pta_status', $stock->pta_status) == 'Official Approved' ? 'selected' : '' }}>
                                 Official Approved
                             </option>
-                            <option value="Not Approved"
-                                {{ old('pta_status', $stock->pta_status) == 'Not Approved' ? 'selected' : '' }}>Not
-                                Approved</option>
-                            @if (request()->type == 'apple')
-                                <option value="Not Approved (4 months remaining)"
-                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
-                                    Not Approved (4 months remaining)</option>
-                                    <option value="Not Approved (2 months remaining)"
-                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
-                                    Not Approved (2 months remaining)</option>
-                            @endif
-
-                            @if (request()->type == 'others')
+                             @if (request()->type == 'others')
                                 <option value="Patch Approved"
                                     {{ old('pta_status', $stock->pta_status) == 'Patch Approved' ? 'selected' : '' }}>Patch
                                     Approved</option>
@@ -418,6 +406,17 @@
                                     {{ old('pta_status', $stock->pta_status) == 'CPID Approved' ? 'selected' : '' }}>CPID
                                     Approved</option>
                             @endif
+                            <option value="Not Approved"
+                                {{ old('pta_status', $stock->pta_status) == 'Not Approved' ? 'selected' : '' }}>Not
+                                Approved</option>
+                                <option value="Not Approved (4 months remaining)"
+                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
+                                    Not Approved (4 months remaining)</option>
+                                    <option value="Not Approved (2 months remaining)"
+                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
+                                    Not Approved (2 months remaining)</option>
+
+
 
                         </select>
                         @error('pta_status')

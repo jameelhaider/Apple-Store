@@ -96,6 +96,7 @@ if (!function_exists('other_companies')) {
             'Google',
             'One Plus',
             'Honor',
+            'Motorola',
         ];
     }
 }

@@ -159,6 +159,14 @@
                                         {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>
                                         Official Approved
                                     </option>
+                                     <option value="Patch Approved"
+                                        {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>
+                                        Patch
+                                        Approved</option>
+                                    <option value="CPID Approved"
+                                        {{ request()->pta_status == 'CPID Approved' ? 'selected' : '' }}>
+                                        CPID
+                                        Approved</option>
                                     <option value="Not Approved"
                                         {{ request()->pta_status == 'Not Approved' ? 'selected' : '' }}>Not
                                         Approved</option>
@@ -169,14 +177,7 @@
                                         {{ request()->pta_status == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
                                         Not Approved (2 months remaining)</option>
 
-                                    <option value="Patch Approved"
-                                        {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>
-                                        Patch
-                                        Approved</option>
-                                    <option value="CPID Approved"
-                                        {{ request()->pta_status == 'CPID Approved' ? 'selected' : '' }}>
-                                        CPID
-                                        Approved</option>
+
 
                                 </select>
                             </div>
