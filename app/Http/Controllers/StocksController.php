@@ -152,7 +152,7 @@ class StocksController extends Controller
             if ($request->type == 'apple') {
                 $stock->model_name = $request->model_name;
             } else {
-                $stock->model_name = ucfirst(strtolower($request->model_name));
+                $stock->model_name = ucwords(strtolower($request->model_name));
             }
 
             if ($request->purchasing_from == 'Local') {
@@ -242,7 +242,7 @@ class StocksController extends Controller
             if ($request->type == 'apple') {
                 $stock->model_name = $request->model_name;
             } else {
-                $stock->model_name = ucfirst(strtolower($request->model_name));
+                 $stock->model_name = ucwords(strtolower($request->model_name));
             }
 
             if ($request->purchasing_from == 'Local') {
