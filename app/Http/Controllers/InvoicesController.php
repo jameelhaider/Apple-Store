@@ -20,6 +20,8 @@ class InvoicesController extends Controller
                 'invoices.*',
                 'stocks.company_name',
                 'stocks.model_name',
+                'stocks.imei1',
+                'stocks.pta_status',
                 'stocks.id as stock_id',
             )
             ->join('stocks', 'stocks.id', '=', 'invoices.stock_id');
@@ -28,6 +30,12 @@ class InvoicesController extends Controller
         }
         if ($request->filled('account_id')) {
             $query->where('invoices.account_id', $request->account_id);
+        }
+        if ($request->filled('imei1')) {
+            $query->where('stocks.imei1', $request->imei1);
+        }
+         if ($request->filled('pta_status')) {
+            $query->where('stocks.pta_status', $request->pta_status);
         }
         if ($request->filled('invoice_no')) {
             $query->where('invoices.id', $request->invoice_no);

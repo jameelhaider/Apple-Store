@@ -405,7 +405,7 @@
                                 <option value="Not Approved (4 months remaining)"
                                     {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
                                     Not Approved (4 months remaining)</option>
-                                    <option value="Not Approved (4 months remaining)"
+                                    <option value="Not Approved (2 months remaining)"
                                     {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
                                     Not Approved (2 months remaining)</option>
                             @endif

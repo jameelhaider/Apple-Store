@@ -137,22 +137,52 @@
                                 <input type="text" class="form-control" placeholder="Enter Name"
                                     value="{{ request()->customer_name }}" name="customer_name">
                             </div>
-
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Customer Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Name"
-                                    value="{{ request()->customer_name }}" name="customer_name">
-                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Customer Phone</label>
-
                                 <input type="text" maxlength="12" placeholder="0399-99999999"
                                     data-inputmask="'mask': '0399-99999999'" value="{{ request()->customer_phone }}"
                                     class="form-control" name="customer_phone">
+                            </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">IMEI 1</label>
+                                <input type="text" pattern="\d{15}" maxlength="15" placeholder="IMEI" name="imei1"
+                                    value="{{ request()->imei1 }}" class="form-control">
 
                             </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">PTA Status</label>
+                                <select name="pta_status" class="form-select">
+                                    <option value="">Select Option</option>
+                                    <option value="Official Approved"
+                                        {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>
+                                        Official Approved
+                                    </option>
+                                    <option value="Not Approved"
+                                        {{ request()->pta_status == 'Not Approved' ? 'selected' : '' }}>Not
+                                        Approved</option>
+                                    <option value="Not Approved (4 months remaining)"
+                                        {{ request()->pta_status == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
+                                        Not Approved (4 months remaining)</option>
+                                    <option value="Not Approved (2 months remaining)"
+                                        {{ request()->pta_status == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
+                                        Not Approved (2 months remaining)</option>
+
+                                    <option value="Patch Approved"
+                                        {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>
+                                        Patch
+                                        Approved</option>
+                                    <option value="CPID Approved"
+                                        {{ request()->pta_status == 'CPID Approved' ? 'selected' : '' }}>
+                                        CPID
+                                        Approved</option>
+
+                                </select>
+                            </div>
+
+
+
 
                             <div class="mb-3">
                                 <label class="form-label">Sold Month</label>
@@ -164,11 +194,13 @@
                                 <button type="submit" class="btn btn-outline-success w-100">
                                     Apply Filters
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary w-100" data-bs-dismiss="offcanvas">
+                                <button type="button" class="btn btn-outline-secondary w-100"
+                                    data-bs-dismiss="offcanvas">
                                     Cancel
                                 </button>
                             </div>
-                            <a href="{{ url('/admin/invoices') }}" class="btn btn-outline-danger w-100 mt-2" >Clear Filters</a>
+                            <a href="{{ url('/admin/invoices') }}" class="btn btn-outline-danger w-100 mt-2">Clear
+                                Filters</a>
                         </div>
                     </div>
 
@@ -193,6 +225,8 @@
                     request()->date ||
                     request()->account_id ||
                     request()->customer_name ||
+                    request()->imei1 ||
+                    request()->pta_status ||
                     request()->customer_phone ||
                     request()->sold_month))
             <div class="alert bg-primary text-white mt-3">
@@ -206,6 +240,8 @@
                     request()->date ||
                     request()->account_id ||
                     request()->customer_name ||
+                    request()->imei1 ||
+                    request()->pta_status ||
                     request()->customer_phone ||
                     request()->sold_month))
             <div class="alert bg-warning text-white mt-3">
@@ -253,6 +289,8 @@
                                         <a class="nav-link text-dark"
                                             href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
                                             {{ $invoice->model_name ? $invoice->model_name : '----------' }}
+                                            <br>
+                                            <span class="fw-light">{{ $invoice->imei1 }}</span>
                                         </a>
                                     </td>
                                     <td class="text-dark purchase-price">
