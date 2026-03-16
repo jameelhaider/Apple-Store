@@ -9,7 +9,7 @@
         <div class="card shadow-sm bg-white rounded-0">
             <div class="row">
                 <div class="col-lg-2 col-3 col-sm-2">
-                    <a href="{{ route('invoices.index') }}"
+                    <a href="{{ route('invoices.index',['type'=>$invoice->type]) }}"
                         class="btn btn-dark custom-back-button d-flex align-items-center justify-content-center">
                         <i class="bx bx-chevron-left me-1"></i> Back
                     </a>
