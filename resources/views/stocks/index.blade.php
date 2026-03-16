@@ -316,28 +316,6 @@
 
 
 
-
-    {{-- <script>
-        // Function to handle delete confirmation
-        function confirmDelete(url) {
-            Swal.fire({
-                title: 'Are you sure you want to delete this Stock?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-            })
-        }
-    </script> --}}
-
-
-
     <!-- Mark As Sold Modal -->
     <div class="modal fade" id="markAsSoldModal" tabindex="-1" role="dialog" aria-labelledby="markAsSoldModalLabel"
         aria-hidden="true">
@@ -401,35 +379,6 @@
 
 
 
-                        {{-- <div class="row mt-2">
-                            <div class="col-lg-6 col-6">
-                                <div class="form-group">
-                                    <label for="buyerName" class="fw-bold text-dark mb-1">Buyer Name <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" placeholder="Buyer Name" id="buyerName"
-                                        name="buyer_name" required>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-6">
-                                <div class="form-group">
-                                    <label for="buyerPhone" class="fw-bold text-dark mb-1">Buyer Phone (optional)</label>
-                                    <input type="text" class="form-control" maxlength="12"
-                                        placeholder="0399-99999999" data-inputmask="'mask': '0399-99999999'"
-                                        id="buyerPhone" name="buyer_phone">
-                                </div>
-                            </div>
-                        </div> --}}
-
-
-                        {{-- <select name="account_id" required class="form-select mt-2" id="accountSelect">
-                            <option value="">Select Account</option>
-                            @foreach ($accounts as $account)
-                                <option value="{{ $account->id }}" data-name="{{ $account->customer_name }}"
-                                    data-phone="{{ $account->customer_phone }}">
-                                    {{ $account->customer_name }}
-                                </option>
-                            @endforeach
-                        </select> --}}
 
 
                         <div class="row mt-2" id="buyerFields" style="display: none">
@@ -585,10 +534,6 @@
     <script>
         $('#model-select').select2({
             placeholder: 'Select Model',
-            allowClear: true
-        });
-        $('#acc-select').select2({
-            placeholder: 'Select Accounr',
             allowClear: true
         });
         $('#company-select').select2({

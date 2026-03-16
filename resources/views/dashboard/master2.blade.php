@@ -177,65 +177,78 @@
                     </li>
 
 
+                  <li class="menu-header small text-uppercase text-dark fw-bold">
+    <span class="menu-header-text">Stocks</span>
+</li>
+
+<li class="menu-item {{ Request::is('admin/stocks*') ? 'active open' : '' }}">
+    <a href="javascript:void(0);"
+        class="menu-link menu-toggle {{ !Request::is('admin/stocks*') ? 'text-dark' : '' }}">
+        <i class="menu-icon tf-icons bx bx-cube-alt"></i>
+        <div>Stocks</div>
+    </a>
+
+    <ul class="menu-sub">
+
+        <!-- Apple Phones -->
+        <li class="menu-item {{ Request::is('admin/stocks/apple*','admin/stocks/*/apple*') ? 'active' : '' }}">
+            <a href="{{ url('admin/stocks/apple') }}"
+                class="menu-link {{ !(Request::is('admin/stocks/apple*','admin/stocks/*/apple*')) ? 'text-dark' : '' }}">
+                <div>Apple Phones</div>
+            </a>
+        </li>
+
+        <!-- Other Phones -->
+        <li class="menu-item {{ Request::is('admin/stocks/others*','admin/stocks/*/others*') ? 'active' : '' }}">
+            <a href="{{ url('admin/stocks/others') }}"
+                class="menu-link {{ !(Request::is('admin/stocks/others*','admin/stocks/*/others*')) ? 'text-dark' : '' }}">
+                <div>Other Phones</div>
+            </a>
+        </li>
+
+    </ul>
+</li>
+
+
+
+
+
+
                     <li class="menu-header small text-uppercase text-dark fw-bold">
-                        <span class="menu-header-text">Stocks</span>
+                        <span class="menu-header-text">List Invoices</span>
                     </li>
 
-                    <li
-                        class="menu-item {{ Request::is('admin/stocks/apple') || Request::is('admin/stocks/others') || Request::is('admin/stocks/create/others') || Request::is('admin/stocks/create/apple') ? 'active' : '' }}">
+                    <li class="menu-item {{ Request::is('admin/invoices/*') ? 'active open' : '' }}">
                         <a href="javascript:void(0);"
-                            class="menu-link menu-toggle {{ !(
-                                Request::is('admin/stocks/apple') ||
-                                Request::is('admin/stocks/others') ||
-                                Request::is('admin/stocks/create/apple') ||
-                                Request::is('admin/stocks/create/others')
-                            )
-                                ? 'text-dark'
-                                : '' }}">
-                            <i class="menu-icon tf-icons bx bx-cube-alt"></i>
-                            <div data-i18n="Misc">Stocks</div>
+                            class="menu-link menu-toggle {{ !Request::is('admin/invoices/*') ? 'text-dark' : '' }}">
+                            <i class="menu-icon tf-icons bx bx-receipt"></i>
+                            <div data-i18n="Misc">List Invoices</div>
                         </a>
 
                         <ul class="menu-sub">
-                            <li
-                                class="menu-item {{ Request::is('admin/stocks/apple') || Request::is('admin/stocks/create/apple') ? 'active' : '' }}">
-                                <a href="{{ url('admin/stocks/apple') }}"
-                                    class="menu-link {{ !Request::is('admin/stocks/apple') ? 'text-dark' : '' }}">
+                            <li class="menu-item {{ Request::is('admin/invoices/apple') ? 'active' : '' }}">
+                                <a href="{{ url('admin/invoices/apple') }}"
+                                    class="menu-link {{ !Request::is('admin/invoices/apple') ? 'text-dark' : '' }}">
                                     <div data-i18n="Error">Apple Phones</div>
                                 </a>
                             </li>
-                            <li
-                                class="menu-item {{ Request::is('admin/stocks/others') || Request::is('admin/stocks/create/others') ? 'active' : '' }}">
-                                <a href="{{ url('admin/stocks/others') }}"
-                                    class="menu-link {{ !Request::is('admin/stocks/handcarries') ? 'text-dark' : '' }}">
+
+                            <li class="menu-item {{ Request::is('admin/invoices/others') ? 'active' : '' }}">
+                                <a href="{{ url('admin/invoices/others') }}"
+                                    class="menu-link {{ !Request::is('admin/invoices/others') ? 'text-dark' : '' }}">
                                     <div data-i18n="Under Maintenance">Other Phones</div>
                                 </a>
                             </li>
+                        </ul>
                     </li>
 
-                </ul>
-                </li>
 
 
 
 
 
-                <!-- Sale History -->
-                <li
-                    class="menu-header small text-uppercase fw-bold {{ Request::is('admin/invoices*') ? '' : 'text-dark' }}">
-                    <span class="menu-header-text">Sale Invoices</span>
-                </li>
 
-                <li class="menu-item {{ Request::is('admin/invoices') ? 'active' : '' }}">
-                    <a href="{{ url('admin/invoices') }}"
-                        class="menu-link {{ Request::is('admin/invoices*') ? '' : 'text-dark' }}">
-                        <i class="menu-icon tf-icons bx bx-receipt"></i>
-                        <div data-i18n="Tables">List Invoices</div>
-                    </a>
-                </li>
-
-
-                 <!-- Accounts -->
+                    <!-- Accounts -->
                     <li
                         class="menu-header small text-uppercase fw-bold {{ Request::is('admin/accounts*') ? '' : 'text-dark' }}">
                         <span class="menu-header-text">Accounts | Cash</span>
@@ -261,7 +274,7 @@
                     </li>
 
 
-                      <!-- Dealers -->
+                    <!-- Dealers -->
                     <li class="menu-header small text-uppercase text-dark fw-bold"><span
                             class="menu-header-text">Dealers</span></li>
                     <li
@@ -274,8 +287,9 @@
                     </li>
 
 
-                  <!-- Device Info -->
-                    <li class="menu-header small text-uppercase text-dark fw-bold"><span class="menu-header-text">Device
+                    <!-- Device Info -->
+                    <li class="menu-header small text-uppercase text-dark fw-bold"><span
+                            class="menu-header-text">Device
                             Info</span></li>
                     <li class="menu-item {{ Request::is('admin/check-model') ? 'active' : '' }}">
                         <a href="{{ url('admin/check-model') }}"
@@ -304,24 +318,25 @@
 
 
 
-                <!-- Months -->
-                <li class="menu-header small text-uppercase text-dark fw-bold"><span class="menu-header-text">Months |
-                        Expenses | Stats</span></li>
-                <li
-                    class="menu-item {{ Request::is('admin/close-month') || Request::is('admin/close-month/create') ? 'active' : '' }}">
-                    <a href="{{ url('admin/close-month') }}"
-                        class="menu-link {{ !(Request::is('admin/close-month') || Request::is('admin/close-month/create')) ? 'text-dark' : '' }}">
-                        <i class="menu-icon tf-icons bx bx-calendar-check"></i>
-                        <div data-i18n="Support" class="small">Start Month / Expenses</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ Request::is('admin/profit-stats') ? 'active' : '' }}">
-                    <a href="{{ url('admin/profit-stats') }}"
-                        class="menu-link {{ !Request::is('admin/profit-stats') ? 'text-dark' : '' }}">
-                        <i class="menu-icon tf-icons bx bx-line-chart"></i>
-                        <div data-i18n="Support">Profit / Stats</div>
-                    </a>
-                </li>
+                    <!-- Months -->
+                    <li class="menu-header small text-uppercase text-dark fw-bold"><span
+                            class="menu-header-text">Months |
+                            Expenses | Stats</span></li>
+                    <li
+                        class="menu-item {{ Request::is('admin/close-month') || Request::is('admin/close-month/create') ? 'active' : '' }}">
+                        <a href="{{ url('admin/close-month') }}"
+                            class="menu-link {{ !(Request::is('admin/close-month') || Request::is('admin/close-month/create')) ? 'text-dark' : '' }}">
+                            <i class="menu-icon tf-icons bx bx-calendar-check"></i>
+                            <div data-i18n="Support" class="small">Start Month / Expenses</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ Request::is('admin/profit-stats') ? 'active' : '' }}">
+                        <a href="{{ url('admin/profit-stats') }}"
+                            class="menu-link {{ !Request::is('admin/profit-stats') ? 'text-dark' : '' }}">
+                            <i class="menu-icon tf-icons bx bx-line-chart"></i>
+                            <div data-i18n="Support">Profit / Stats</div>
+                        </a>
+                    </li>
 
 
 
@@ -336,19 +351,19 @@
 
 
 
-                <li class="menu-header small text-uppercase text-dark fw-bold"><span
-                        class="menu-header-text">Actions</span></li>
-                <div class="px-3">
-                    <a href="{{ route('export.database') }}" class="btn btn-primary w-100">
-                        Export Back Up
-                    </a>
-                    <a href="{{ route('send.database.backup') }}" class="btn btn-primary w-100 mt-2">
-                        Send Backup To Mail
-                    </a>
+                    <li class="menu-header small text-uppercase text-dark fw-bold"><span
+                            class="menu-header-text">Actions</span></li>
+                    <div class="px-3">
+                        <a href="{{ route('export.database') }}" class="btn btn-primary w-100">
+                            Export Back Up
+                        </a>
+                        <a href="{{ route('send.database.backup') }}" class="btn btn-primary w-100 mt-2">
+                            Send Backup To Mail
+                        </a>
 
 
-                    <a href="{{ url('/logout') }}" class="btn btn-primary w-100 mt-2 mb-4">Log Out</a>
-                </div>
+                        <a href="{{ url('/logout') }}" class="btn btn-primary w-100 mt-2 mb-4">Log Out</a>
+                    </div>
 
 
                 </ul>

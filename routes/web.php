@@ -250,7 +250,7 @@ Route::middleware(['auth'])->group(function () {
         Route::group(['prefix' => 'invoices'], function () {
             Route::get('/view/{id}', [InvoicesController::class, 'view'])->name("invoice.view");
             //index
-            Route::get('/', [InvoicesController::class, 'index'])->name("invoices.index");
+            Route::get('/{type}', [InvoicesController::class, 'index'])->name("invoices.index");
         });
 
 

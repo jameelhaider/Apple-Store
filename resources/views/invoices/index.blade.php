@@ -79,7 +79,7 @@
         <div class="card mb-2 p-2 mt-2">
             <form action="" method="GET">
                 <div class="row">
-                    <div class="col-lg-3 col-md-4 col-sm-4 col-6 mt-1 mb-1">
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-6 mt-1 mb-1">
                         <select name="account_id" class="form-select" id="acc-select" onchange="this.form.submit()">
                             <option value="{{ null }}">Select Account</option>
                             @foreach ($accounts as $account)
@@ -89,19 +89,47 @@
                             @endforeach
                         </select>
                     </div>
+                    @if (request()->type == 'others')
+                        <div class="col-lg-3 col-md-6 col-sm-4 col-6 mt-1 mb-1">
+                            <select name="company_name" id="company-select" class="form-select"
+                                onchange="this.form.submit()">
+                                <option value="{{ null }}">Select Company</option>
+                                @foreach (other_companies() as $company)
+                                    <option value="{{ $company }}"
+                                        {{ request()->company_name == $company ? 'selected' : '' }}>
+                                        {{ $company }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @else
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-6 mt-1 mb-1">
+                            <select name="model_name" id="model-select" class="form-select" onchange="this.form.submit()">
+                                <option value="{{ null }}">Select Model</option>
+                                @foreach (iphone_models() as $model)
+                                    <option value="{{ $model }}"
+                                        {{ request()->model_name == $model ? 'selected' : '' }}>
+                                        {{ $model }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
 
 
-                    <div class="col-lg-3 col-md-4 col-sm-4 col-6 mt-1 mb-1">
+
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-6 mt-1 mb-1">
                         <input type="text" class="form-control" value="{{ request()->invoice_id }}"
                             placeholder="Invoice Id" name="invoice_id">
                     </div>
 
-                    <div class="col-lg-3 col-md-4 col-sm-4 col-6 mt-1 mb-1">
-                        <input type="date" class="form-control" value="{{ request()->date }}" name="date">
-                    </div>
+
+
+
                     <div class="col-lg-3 col-md-4 col-sm-4 mt-1 mb-1">
                         <div class="btn-group w-100" role="group">
-                            <a href="{{ url('admin/invoices') }}" title="Clear" class="btn btn-outline-danger">
+                            <a @if (request()->type == 'others') href="{{ url('admin/invoices/others') }}"
+                            @else
+href="{{ url('admin/invoices/apple') }}" @endif
+                                title="Clear" class="btn btn-outline-danger">
                                 Clear
                             </a>
 
@@ -129,9 +157,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
                                 aria-label="Close"></button>
                         </div>
-
                         <div class="offcanvas-body">
-
                             <div class="mb-3">
                                 <label class="form-label">Customer Name</label>
                                 <input type="text" class="form-control" placeholder="Enter Name"
@@ -159,14 +185,18 @@
                                         {{ request()->pta_status == 'Official Approved' ? 'selected' : '' }}>
                                         Official Approved
                                     </option>
-                                     <option value="Patch Approved"
-                                        {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>
-                                        Patch
-                                        Approved</option>
-                                    <option value="CPID Approved"
-                                        {{ request()->pta_status == 'CPID Approved' ? 'selected' : '' }}>
-                                        CPID
-                                        Approved</option>
+
+                                    @if (request()->type == 'others')
+                                        <option value="Patch Approved"
+                                            {{ request()->pta_status == 'Patch Approved' ? 'selected' : '' }}>
+                                            Patch
+                                            Approved</option>
+                                        <option value="CPID Approved"
+                                            {{ request()->pta_status == 'CPID Approved' ? 'selected' : '' }}>
+                                            CPID
+                                            Approved</option>
+                                    @endif
+
                                     <option value="Not Approved"
                                         {{ request()->pta_status == 'Not Approved' ? 'selected' : '' }}>Not
                                         Approved</option>
@@ -186,6 +216,12 @@
 
 
                             <div class="mb-3">
+                                <label class="form-label">Sold Date</label>
+                                <input type="date" class="form-control" value="{{ request()->date }}"
+                                    name="date">
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label">Sold Month</label>
                                 <input type="month" class="form-control" value="{{ request()->sold_month }}"
                                     name="sold_month">
@@ -200,7 +236,10 @@
                                     Cancel
                                 </button>
                             </div>
-                            <a href="{{ url('/admin/invoices') }}" class="btn btn-outline-danger w-100 mt-2">Clear
+                            <a @if (request()->type == 'others') href="{{ url('admin/invoices/others') }}"
+                            @else
+href="{{ url('admin/invoices/apple') }}" @endif
+                                class="btn btn-outline-danger w-100 mt-2">Clear
                                 Filters</a>
                         </div>
                     </div>
@@ -228,6 +267,8 @@
                     request()->customer_name ||
                     request()->imei1 ||
                     request()->pta_status ||
+                    request()->model_name ||
+                    request()->company_name ||
                     request()->customer_phone ||
                     request()->sold_month))
             <div class="alert bg-primary text-white mt-3">
@@ -242,7 +283,9 @@
                     request()->account_id ||
                     request()->customer_name ||
                     request()->imei1 ||
+                    request()->model_name ||
                     request()->pta_status ||
+                    request()->company_name ||
                     request()->customer_phone ||
                     request()->sold_month))
             <div class="alert bg-warning text-white mt-3">
@@ -262,7 +305,10 @@
                             <tr class="text-center">
                                 <th style="font-size:14px" class="text-dark fw-bold">#</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Invoice Id</th>
-                                <th style="font-size:14px" class="text-dark fw-bold">Company</th>
+                                @if (request()->type == 'others')
+                                    <th style="font-size:14px" class="text-dark fw-bold">Company</th>
+                                @endif
+
                                 <th style="font-size:14px" class="text-dark fw-bold">Model</th>
                                 <th style="font-size:14px" class="text-dark fw-bold purchase-price">Profit</th>
                                 <th style="font-size:14px" class="text-dark fw-bold">Sale</th>
@@ -281,11 +327,15 @@
                                             {{ $invoice->invoice_id }}
                                         </a>
                                     </td>
-                                    <td> <a class="nav-link text-dark"
-                                            href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
-                                            {{ $invoice->company_name ? $invoice->company_name : '----------' }}
-                                        </a>
-                                    </td>
+
+                                    @if (request()->type == 'others')
+                                        <td> <a class="nav-link text-dark"
+                                                href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
+                                                {{ $invoice->company_name ? $invoice->company_name : '----------' }}
+                                            </a>
+                                        </td>
+                                    @endif
+
                                     <td class="fw-bold">
                                         <a class="nav-link text-dark"
                                             href="{{ route('invoice.view', ['id' => $invoice->id]) }}">
@@ -459,8 +509,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
     <script>
+        $('#model-select').select2({
+            placeholder: 'Select Model',
+            allowClear: true
+        });
         $('#acc-select').select2({
             placeholder: 'Select Account',
+            allowClear: true
+        });
+        $('#company-select').select2({
+            placeholder: 'Select Company',
             allowClear: true
         });
     </script>
