@@ -10,62 +10,6 @@ use Illuminate\Support\Facades\Gate;
 
 class InvoicesController extends Controller
 {
-    // public function index(Request $request,$type)
-    // {
-    //     if (!Gate::allows('is_admin')) {
-    //         abort(401, 'Unauthorized action.');
-    //     }
-    //     $query = Invoices::query()
-    //         ->select(
-    //             'invoices.*',
-    //             'stocks.company_name',
-    //             'stocks.model_name',
-    //             'stocks.imei1',
-    //             'stocks.pta_status',
-    //             'stocks.id as stock_id',
-    //         )
-    //         ->join('stocks', 'stocks.id', '=', 'invoices.stock_id');
-    //     if ($request->filled('invoice_id')) {
-    //         $query->where('invoices.invoice_id', $request->invoice_id);
-    //     }
-    //     if ($request->filled('account_id')) {
-    //         $query->where('invoices.account_id', $request->account_id);
-    //     }
-    //     if ($request->filled('imei1')) {
-    //         $query->where('stocks.imei1', $request->imei1);
-    //     }
-    //      if ($request->filled('pta_status')) {
-    //         $query->where('stocks.pta_status', $request->pta_status);
-    //     }
-    //     if ($request->filled('invoice_no')) {
-    //         $query->where('invoices.id', $request->invoice_no);
-    //     }
-    //     if ($request->filled('customer_phone')) {
-    //         $query->where('invoices.buyer_phone', $request->customer_phone);
-    //     }
-    //     if ($request->filled('customer_name')) {
-    //         $query->where('invoices.buyer_name', 'LIKE', '%' . $request->customer_name . '%');
-    //     }
-    //     if ($request->filled('date')) {
-    //         $query->whereDate('invoices.sold_date', '=', $request->date);
-    //     }
-
-    //     if ($request->filled('sold_month')) {
-    //         [$year, $month] = explode('-', $request->sold_month);
-
-    //         $query->whereYear('invoices.sold_date', $year)
-    //             ->whereMonth('invoices.sold_date', $month);
-    //     }
-
-    //     $invoices = $query
-    //         ->orderBy('invoices.created_at', 'desc')
-    //         ->paginate(500);
-    //     $accounts = DB::table('accounts')->get();
-    //     return view('invoices.index', compact('invoices', 'accounts'));
-    // }
-
-
-
     public function index(Request $request, $type)
     {
         if (!Gate::allows('is_admin')) {
