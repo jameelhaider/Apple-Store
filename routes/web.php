@@ -171,8 +171,13 @@ Route::middleware(['auth'])->group(function () {
                 $endOfWeek = Carbon::now()->endOfWeek();
                 $startOfYear = Carbon::now()->startOfYear();
                 $endOfYear = Carbon::now()->endOfYear();
-                $startOfPreviousMonth = Carbon::now()->subMonth()->startOfMonth();
-                $endOfPreviousMonth = Carbon::now()->subMonth()->endOfMonth();
+                // $startOfPreviousMonth = Carbon::now()->subMonth()->startOfMonth();
+                // $endOfPreviousMonth = Carbon::now()->subMonth()->endOfMonth();
+
+                 $previousMonth = Carbon::now()->subMonthNoOverflow();
+                $startOfPreviousMonth = $previousMonth->copy()->startOfMonth();
+                $endOfPreviousMonth = $previousMonth->copy()->endOfMonth();
+
                 $todayRevenue = DB::table('invoices')
                     ->whereDate('sold_date', $today)
                     ->sum('profit');
