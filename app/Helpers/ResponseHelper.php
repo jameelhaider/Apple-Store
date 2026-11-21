@@ -1,59 +1,116 @@
 <?php
 
+
 if (!function_exists('iphone_models')) {
     function iphone_models(): array
     {
         return [
+            // iPhone 18 Series (2026)
+            'iPhone Duo',
+            'iPhone 18 Pro Max',
+            'iPhone 18 Pro',
+
+            // iPhone 17 Series (2025-2026)
+            'iPhone 17e',
             'iPhone 17 Pro Max',
             'iPhone 17 Pro',
-            'iPhone 17 Air',
+            'iPhone Air',
             'iPhone 17',
+
+            // iPhone 16 Series (2025)
+            'iPhone 16e',
             'iPhone 16 Pro Max',
             'iPhone 16 Pro',
             'iPhone 16 Plus',
             'iPhone 16',
+
+            // iPhone 15 Series (2023)
             'iPhone 15 Pro Max',
             'iPhone 15 Pro',
             'iPhone 15 Plus',
             'iPhone 15',
+
+            // iPhone 14 Series (2022)
             'iPhone 14 Pro Max',
             'iPhone 14 Pro',
             'iPhone 14 Plus',
             'iPhone 14',
+
+            // iPhone SE (2022)
             'iPhone SE (3rd Gen)',
+
+            // iPhone 13 Series (2021)
             'iPhone 13 Pro Max',
             'iPhone 13 Pro',
             'iPhone 13',
             'iPhone 13 mini',
+
+            // iPhone 12 Series (2020)
             'iPhone 12 Pro Max',
             'iPhone 12 Pro',
             'iPhone 12',
             'iPhone 12 mini',
+
+            // iPhone SE (2020)
             'iPhone SE (2nd Gen)',
+
+            // iPhone 11 Series (2019)
             'iPhone 11 Pro Max',
             'iPhone 11 Pro',
             'iPhone 11',
+
+            // iPhone XS / XR Series (2018)
             'iPhone XS Max',
             'iPhone XS',
             'iPhone XR',
+
+            // iPhone X Series (2017)
             'iPhone X',
+
+            // iPhone 8 Series (2017)
             'iPhone 8 Plus',
             'iPhone 8',
+
+            // iPhone 7 Series (2016)
             'iPhone 7 Plus',
             'iPhone 7',
+
+            // iPhone SE (2016)
             'iPhone SE (1st Gen)',
+
+            // iPhone 6s Series (2015)
             'iPhone 6s Plus',
             'iPhone 6s',
+
+            // iPhone 6 Series (2014)
             'iPhone 6 Plus',
             'iPhone 6',
+
+            // iPhone 5s / 5c Series (2013)
             'iPhone 5s',
             'iPhone 5c',
+
+            // iPhone 5 (2012)
             'iPhone 5',
+
+            // iPhone 4s (2011)
             'iPhone 4s',
+
+            // iPhone 4 (2010)
             'iPhone 4',
+
+            // iPhone 3GS (2009)
+            'iPhone 3GS',
+
+            // iPhone 3G (2008)
+            'iPhone 3G',
+
+            // Original iPhone (2007)
+            'iPhone (1st Gen)',
         ];
     }
 }
+
 
 
 function isValidImei($imei)
