@@ -21,6 +21,7 @@ class Stocks extends Model
         'country_status',
         'sim_status',
         'health',
+        'color',
         'type',
         'status',
         'purchase',

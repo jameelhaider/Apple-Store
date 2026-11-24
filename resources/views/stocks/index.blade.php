@@ -169,8 +169,13 @@
                                     {{ $stock->created_at->format('d M Y') }}</span>
                             </div>
 
-                            <a href="{{ route('stock.view', ['id' => $stock->id]) }}" class="item-model"
-                                title="View Details">{{ $stock->model_name }}</a>
+                            {{-- <a href="{{ route('stock.view', ['id' => $stock->id]) }}" class="item-model"
+                                title="View Details">{{ $stock->model_name }}</a> --}}
+                                <a href="{{ route('stock.view', ['id' => $stock->id]) }}"
+   class="item-model"
+   title="View Details">
+    {{ $stock->model_name }}{{ $stock->color ? ' - ' . $stock->color : '' }}
+</a>
 
                             <div class="specs">
                                 <div class="sp"><small>Storage</small><b>{{ $stock->rom ?: '—' }}</b></div>

@@ -192,7 +192,8 @@
 
 
 
-                            <select name="model_name" id="model-select" required class="form-select @error('model_name') is-invalid @enderror">
+                            <select name="model_name" id="model-select" required
+                                class="form-select @error('model_name') is-invalid @enderror">
                                 <option value="">Select iPhone Model</option>
 
                                 @foreach (iphone_models() as $model)
@@ -298,7 +299,8 @@
 
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">Storage / ROM<span class="text-danger">*</span></label>
-                        <select name="rom" required id="rom-select" class="form-select @error('rom') is-invalid @enderror">
+                        <select name="rom" required id="rom-select"
+                            class="form-select @error('rom') is-invalid @enderror">
                             <option value="">Select Option</option>
                             <option value="1 GB" {{ old('rom', $stock->rom) == '1 GB' ? 'selected' : '' }}>1 GB</option>
                             <option value="2 GB" {{ old('rom', $stock->rom) == '2 GB' ? 'selected' : '' }}>2 GB</option>
@@ -340,10 +342,231 @@
                                 </span>
                             @enderror
                         </div>
+
+
+<div class="col-lg-4 col-md-4 col-6">
+
+    <label class="fw-bold mb-2 text-dark">
+        COLOR <span class="text-danger">*</span>
+    </label>
+
+    @php
+        // Apple iPhone colors + additional inventory shades
+        $iphoneColors = [
+            // Black shades
+            'Black' => '#000000',
+            'Space Black' => '#292929',
+            'Jet Black' => '#050505',
+            'Graphite' => '#414141',
+            'Space Gray' => '#535353',
+            'Midnight' => '#191E2A',
+            'Midnight Black' => '#101010',
+            'Onyx Black' => '#353839',
+            'Matte Black' => '#222222',
+
+            // White and silver shades
+            'White' => '#FFFFFF',
+            'Silver' => '#C0C0C0',
+            'Starlight' => '#F0E5D3',
+            'Star White' => '#F5F5F0',
+            'Cloud White' => '#F4F3EF',
+            'White Titanium' => '#E5E5E0',
+            'Glacier' => '#DCE7EA',
+            'Cream' => '#FFFDD0',
+            'Ivory' => '#FFFFF0',
+
+            // Gold shades
+            'Gold' => '#D4AF37',
+            'Rose Gold' => '#B76E79',
+            'Champagne Gold' => '#E7C27D',
+            'Light Gold' => '#D9C5A3',
+
+            // Red shades
+            'Red' => '#D70018',
+            'PRODUCT RED' => '#C8102E',
+            'Red (PRODUCT RED)' => '#C8102E',
+            'Burgundy' => '#800020',
+            'Wine Red' => '#722F37',
+            'Dark Red' => '#8B0000',
+            'Coral' => '#FF7F50',
+
+            // Pink shades
+            'Pink' => '#F5A9BC',
+            'Soft Pink' => '#F4C2C2',
+            'Rose Pink' => '#F4C2C2',
+            'Light Pink' => '#FFB6C1',
+
+            // Blue shades
+            'Blue' => '#4A90E2',
+            'Deep Blue' => '#173B65',
+            'Dark Blue' => '#00008B',
+            'Light Blue' => '#ADD8E6',
+            'Midnight Blue' => '#191970',
+            'Pacific Blue' => '#345B75',
+            'Sierra Blue' => '#A9C3D5',
+            'Blue Titanium' => '#526477',
+            'Ultramarine' => '#4B54C8',
+            'Sky Blue' => '#87CEEB',
+            'Mist Blue' => '#A9C9D5',
+            'Space Blue' => '#3A5A78',
+
+            // Green shades
+            'Green' => '#5E8C61',
+            'Alpine Green' => '#53665A',
+            'Midnight Green' => '#45564B',
+            'Sage' => '#A3AC91',
+            'Teal' => '#008C95',
+            'Mint' => '#BDECC8',
+            'Light Green' => '#90EE90',
+            'Dark Green' => '#006400',
+            'Olive Green' => '#808000',
+
+            // Yellow and orange shades
+            'Yellow' => '#F9D849',
+            'Orange' => '#FFA500',
+            'Cosmic Orange' => '#F47A38',
+
+            // Purple shades
+            'Purple' => '#A88BC5',
+            'Deep Purple' => '#594267',
+            'Lavender' => '#C8A2C8',
+            'Violet' => '#8F00FF',
+
+            // Titanium finishes
+            'Titanium' => '#878681',
+            'Natural Titanium' => '#A7A49B',
+            'Black Titanium' => '#373737',
+            'Desert Titanium' => '#BFA58A',
+
+            // Other shades
+            'Brown' => '#8B4513',
+            'Tan' => '#D2B48C',
+            'Rose' => '#FF007F',
+            'Gray' => '#808080',
+            'Grey' => '#808080',
+        ];
+
+        $selectedColor = old('color', $stock->color ?? '');
+    @endphp
+
+    <select
+        name="color"
+        id="color-select"
+        required
+        class="form-select @error('color') is-invalid @enderror"
+        onchange="updateIphoneColorPreview(this.value)"
+    >
+        <option value="">Select Color</option>
+
+        @foreach($iphoneColors as $colorName => $colorCode)
+            <option
+                value="{{ $colorName }}"
+                {{ $selectedColor == $colorName ? 'selected' : '' }}
+            >
+                {{ $colorName }}
+            </option>
+        @endforeach
+    </select>
+
+    @error('color')
+        <span class="invalid-feedback" role="alert">
+            <strong>{{ $message }}</strong>
+        </span>
+    @enderror
+
+    {{-- LIVE COLOR PREVIEW --}}
+    <div id="iphone-color-preview"
+         class="mt-3 p-2 rounded border d-flex align-items-center"
+         style="gap: 12px; display: none !important;">
+
+        <div id="iphone-color-circle"
+             style="
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                border-radius: 50%;
+                border: 2px solid #999;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+             ">
+        </div>
+
+        <div>
+            <div class="small text-muted">Selected Color</div>
+            <div id="iphone-color-name" class="fw-bold text-dark"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    // Apple iPhone color preview
+    const iphoneColorPreviewMap = @json($iphoneColors);
+
+    function updateIphoneColorPreview(color) {
+
+        const preview = document.getElementById('iphone-color-preview');
+        const circle = document.getElementById('iphone-color-circle');
+        const name = document.getElementById('iphone-color-name');
+
+        if (!preview || !circle || !name) return;
+
+        const hex = iphoneColorPreviewMap[color];
+
+        if (!color || !hex) {
+            preview.style.setProperty('display', 'none', 'important');
+            return;
+        }
+
+        preview.style.setProperty('display', 'flex', 'important');
+
+        circle.style.backgroundColor = hex;
+        name.textContent = color;
+
+        // Border for lighter colors
+        const lightColors = [
+            'White',
+            'Silver',
+            'Starlight',
+            'Star White',
+            'Cloud White',
+            'White Titanium',
+            'Cream',
+            'Ivory',
+            'Light Pink',
+            'Pink',
+            'Soft Pink',
+            'Mint',
+            'Light Blue',
+            'Sky Blue',
+            'Mist Blue',
+            'Yellow',
+            'Light Green'
+        ];
+
+        circle.style.borderColor = lightColors.includes(color)
+            ? '#999999'
+            : '#cccccc';
+    }
+
+    // Load existing or previously selected color
+    document.addEventListener('DOMContentLoaded', function () {
+        const select = document.getElementById('color-select');
+
+        if (select) {
+            updateIphoneColorPreview(select.value);
+        }
+    });
+
+    // Also initialize immediately if the script runs after the HTML
+    updateIphoneColorPreview(@json($selectedColor));
+</script>
+
                     @else
                         <div class="col-lg-4 col-md-4 col-6">
                             <label class="fw-bold mb-2 text-dark">RAM<span class="text-danger">*</span></label>
-                            <select name="ram" required id="ram-select" class="form-select @error('ram') is-invalid @enderror">
+                            <select name="ram" required id="ram-select"
+                                class="form-select @error('ram') is-invalid @enderror">
                                 <option value="">Select Option</option>
                                 <option value="128 MB" {{ old('ram', $stock->ram) == '128 MB' ? 'selected' : '' }}>128 MB
                                 </option>
@@ -398,9 +621,10 @@
                                 {{ old('pta_status', $stock->pta_status) == 'Official Approved' ? 'selected' : '' }}>
                                 Official Approved
                             </option>
-                             @if (request()->type == 'others')
+                            @if (request()->type == 'others')
                                 <option value="Patch Approved"
-                                    {{ old('pta_status', $stock->pta_status) == 'Patch Approved' ? 'selected' : '' }}>Patch
+                                    {{ old('pta_status', $stock->pta_status) == 'Patch Approved' ? 'selected' : '' }}>
+                                    Patch
                                     Approved</option>
                                 <option value="CPID Approved"
                                     {{ old('pta_status', $stock->pta_status) == 'CPID Approved' ? 'selected' : '' }}>CPID
@@ -409,12 +633,12 @@
                             <option value="Not Approved"
                                 {{ old('pta_status', $stock->pta_status) == 'Not Approved' ? 'selected' : '' }}>Not
                                 Approved</option>
-                                <option value="Not Approved (4 months remaining)"
-                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
-                                    Not Approved (4 months remaining)</option>
-                                    <option value="Not Approved (2 months remaining)"
-                                    {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
-                                    Not Approved (2 months remaining)</option>
+                            <option value="Not Approved (4 months remaining)"
+                                {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
+                                Not Approved (4 months remaining)</option>
+                            <option value="Not Approved (2 months remaining)"
+                                {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
+                                Not Approved (2 months remaining)</option>
 
 
 
@@ -482,40 +706,39 @@
 
 
                 <div class="row mt-3">
-                       <!-- SIM Status -->
+                    <!-- SIM Status -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">SIM TYPE<span class="text-danger">*</span></label>
 
-<select name="sim_status"
-    class="form-select @error('sim_status') is-invalid @enderror" required>
-    <option value="">Select SIM Type</option>
+                        <select name="sim_status" class="form-select @error('sim_status') is-invalid @enderror" required>
+                            <option value="">Select SIM Type</option>
 
-    <option value="Single Physical SIM"
-        {{ old('sim_status', $stock->sim_status) == 'Single Physical SIM' ? 'selected' : '' }}>
-        Single Physical SIM
-    </option>
+                            <option value="Single Physical SIM"
+                                {{ old('sim_status', $stock->sim_status) == 'Single Physical SIM' ? 'selected' : '' }}>
+                                Single Physical SIM
+                            </option>
 
-    <option value="Dual Physical SIM"
-        {{ old('sim_status', $stock->sim_status) == 'Dual Physical SIM' ? 'selected' : '' }}>
-        Dual Physical SIM
-    </option>
+                            <option value="Dual Physical SIM"
+                                {{ old('sim_status', $stock->sim_status) == 'Dual Physical SIM' ? 'selected' : '' }}>
+                                Dual Physical SIM
+                            </option>
 
-    <option value="Single eSIM"
-        {{ old('sim_status', $stock->sim_status) == 'Single eSIM' ? 'selected' : '' }}>
-        Single eSIM
-    </option>
+                            <option value="Single eSIM"
+                                {{ old('sim_status', $stock->sim_status) == 'Single eSIM' ? 'selected' : '' }}>
+                                Single eSIM
+                            </option>
 
-    <option value="Dual eSIM"
-        {{ old('sim_status', $stock->sim_status) == 'Dual eSIM' ? 'selected' : '' }}>
-        Dual eSIM
-    </option>
+                            <option value="Dual eSIM"
+                                {{ old('sim_status', $stock->sim_status) == 'Dual eSIM' ? 'selected' : '' }}>
+                                Dual eSIM
+                            </option>
 
-    <option value="Physical SIM + eSIM"
-        {{ old('sim_status', $stock->sim_status) == 'Physical SIM + eSIM' ? 'selected' : '' }}>
-        Physical SIM + eSIM
-    </option>
+                            <option value="Physical SIM + eSIM"
+                                {{ old('sim_status', $stock->sim_status) == 'Physical SIM + eSIM' ? 'selected' : '' }}>
+                                Physical SIM + eSIM
+                            </option>
 
-</select>
+                        </select>
 
                         @error('sim_status')
                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
@@ -605,8 +828,12 @@
             placeholder: 'Select Model',
             allowClear: true
         });
-         $('#company-select').select2({
+        $('#company-select').select2({
             placeholder: 'Select Company',
+            allowClear: true
+        });
+        $('#color-select').select2({
+            placeholder: 'Select Color',
             allowClear: true
         });
         $('#ram-select').select2({

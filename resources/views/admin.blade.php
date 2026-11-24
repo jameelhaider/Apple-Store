@@ -182,7 +182,7 @@
             document.getElementById("submitPassword").addEventListener("click", function() {
                 let pass = document.getElementById("confirmPassword").value;
 
-                if (pass === "2cbc0") {
+                if (pass === "1234") {
                     document.getElementById("rassValue").innerText = "RS." + formatNumber(realValue);
                     document.getElementById("errorMsg").classList.add("d-none");
                     bootstrap.Modal.getInstance(document.getElementById('passwordModal')).hide();

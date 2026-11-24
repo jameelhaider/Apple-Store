@@ -26,6 +26,7 @@ public function index(Request $request, $type)
                 'stocks.pushasing_from_name',
                 'stocks.health',
                 'stocks.rom',
+                'stocks.color',
                 'stocks.ram',
                 'stocks.activation_status',
                 'stocks.country_status',
@@ -142,6 +143,7 @@ public function index(Request $request, $type)
                 'purchase' => 'required|integer|min:1',
                 'sale'     => 'required|integer|gte:purchase',
                 'purchasing_from'     => 'required|in:Local,Dealer',
+                'color'     => 'nullable',
                 'sim_status' => 'required|in:Single Physical SIM,Dual Physical SIM,Single eSIM,Dual eSIM,Physical SIM + eSIM',
 
                 'pushasing_from_phone' => [
@@ -205,6 +207,7 @@ public function index(Request $request, $type)
             $stock->company_name = $request->company_name;
             $stock->rom = $request->rom;
             $stock->ram = $request->ram;
+            $stock->color = $request->color;
             $stock->health = $request->health;
             $stock->status = 'Available';
             $stock->imei1 = $request->imei1;
@@ -235,6 +238,7 @@ public function index(Request $request, $type)
                 'purchase' => 'required|integer|min:1',
                 'sale'     => 'required|integer|gte:purchase',
                 'purchasing_from'     => 'required|in:Local,Dealer',
+                'color'     => 'nullable',
                 'sim_status' => 'required|in:Single Physical SIM,Dual Physical SIM,Single eSIM,Dual eSIM,Physical SIM + eSIM',
                 'pushasing_from_phone' => [
                     'nullable',
@@ -297,6 +301,7 @@ public function index(Request $request, $type)
             $stock->company_name = $request->company_name;
             $stock->rom = $request->rom;
             $stock->ram = $request->ram;
+            $stock->color = $request->color;
             $stock->health = $request->health;
             $stock->imei1 = $request->imei1;
             $stock->imei2 = $request->imei2;
