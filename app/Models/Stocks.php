@@ -19,6 +19,7 @@ class Stocks extends Model
         'pta_status',
         'activation_status',
         'country_status',
+        'sim_status',
         'health',
         'type',
         'status',

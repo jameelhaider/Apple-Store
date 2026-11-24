@@ -16,7 +16,7 @@ class StocksController extends Controller
     {
         if (Gate::allows('is_admin')) {
             $query = Stocks::query()
-                ->select('company_name', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at', 'pta_status')
+                ->select('company_name','sim_status','health','sim_status','rom','ram','activation_status','country_status', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at', 'pta_status')
                 ->where('type', $type)
                 ->where('status', 'Available');
             if ($request->model_name) {
@@ -110,6 +110,7 @@ class StocksController extends Controller
                 'purchase' => 'required|integer|min:1',
                 'sale'     => 'required|integer|gte:purchase',
                 'purchasing_from'     => 'required|in:Local,Dealer',
+                'sim_status' => 'required|in:Single Physical SIM,Dual Physical SIM,Single eSIM,Dual eSIM,Physical SIM + eSIM',
 
                 'pushasing_from_phone' => [
                     'nullable',
@@ -177,6 +178,7 @@ class StocksController extends Controller
             $stock->imei1 = $request->imei1;
             $stock->imei2 = $request->imei2;
             $stock->pta_status = $request->pta_status;
+            $stock->sim_status = $request->sim_status;
             $stock->activation_status = $request->activation_status;
             $stock->country_status = $request->country_status;
             $stock->type = $request->type;
@@ -201,6 +203,7 @@ class StocksController extends Controller
                 'purchase' => 'required|integer|min:1',
                 'sale'     => 'required|integer|gte:purchase',
                 'purchasing_from'     => 'required|in:Local,Dealer',
+                'sim_status' => 'required|in:Single Physical SIM,Dual Physical SIM,Single eSIM,Dual eSIM,Physical SIM + eSIM',
                 'pushasing_from_phone' => [
                     'nullable',
                     'regex:/^03\d{2}-\d{7}$/'
@@ -265,6 +268,7 @@ class StocksController extends Controller
             $stock->health = $request->health;
             $stock->imei1 = $request->imei1;
             $stock->imei2 = $request->imei2;
+             $stock->sim_status = $request->sim_status;
             $stock->pta_status = $request->pta_status;
             $stock->activation_status = $request->activation_status;
             $stock->country_status = $request->country_status;

@@ -482,6 +482,48 @@
 
 
                 <div class="row mt-3">
+                       <!-- SIM Status -->
+                    <div class="col-lg-4 col-md-4 col-6">
+                        <label class="fw-bold mb-2 text-dark">SIM Type<span class="text-danger">*</span></label>
+
+<select name="sim_status"
+    class="form-select @error('sim_status') is-invalid @enderror" required>
+    <option value="">Select SIM Type</option>
+
+    <option value="Single Physical SIM"
+        {{ old('sim_status', $stock->sim_status) == 'Single Physical SIM' ? 'selected' : '' }}>
+        Single Physical SIM
+    </option>
+
+    <option value="Dual Physical SIM"
+        {{ old('sim_status', $stock->sim_status) == 'Dual Physical SIM' ? 'selected' : '' }}>
+        Dual Physical SIM
+    </option>
+
+    <option value="Single eSIM"
+        {{ old('sim_status', $stock->sim_status) == 'Single eSIM' ? 'selected' : '' }}>
+        Single eSIM
+    </option>
+
+    <option value="Dual eSIM"
+        {{ old('sim_status', $stock->sim_status) == 'Dual eSIM' ? 'selected' : '' }}>
+        Dual eSIM
+    </option>
+
+    <option value="Physical SIM + eSIM"
+        {{ old('sim_status', $stock->sim_status) == 'Physical SIM + eSIM' ? 'selected' : '' }}>
+        Physical SIM + eSIM
+    </option>
+
+</select>
+
+                        @error('sim_status')
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                        @enderror
+                    </div>
+
+
+
                     <div class="col-lg-4 col-md-4 col-6">
                         <label for="" class="fw-bold mb-2 text-dark">PURCHASE PRICE<span
                                 class="text-danger">*</span></label>
