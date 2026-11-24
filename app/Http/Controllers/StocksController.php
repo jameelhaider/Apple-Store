@@ -12,35 +12,67 @@ use Illuminate\Support\Facades\Gate;
 
 class StocksController extends Controller
 {
-    public function index(Request $request, $type)
-    {
-        if (Gate::allows('is_admin')) {
-            $query = Stocks::query()
-                ->select('company_name','sim_status','health','sim_status','rom','ram','activation_status','country_status', 'id', 'purchase', 'sale', 'imei1', 'imei2', 'model_name', 'type', 'created_at', 'pta_status')
-                ->where('type', $type)
-                ->where('status', 'Available');
-            if ($request->model_name) {
-                $query->where('stocks.model_name', $request->model_name);
-            }
-            if ($request->company_name) {
-                $query->where('stocks.company_name', $request->company_name);
-            }
-            if ($request->imei1) {
-                $query->where('stocks.imei1', $request->imei1);
-            }
 
-            if ($request->pta_status) {
-                $query->where('stocks.pta_status', $request->pta_status);
-            }
-            $stocks = $query
-                ->orderBy('created_at', 'desc')
-                ->paginate(1000);
-            $accounts = DB::table('accounts')->get();
-            return view('stocks.index', compact('stocks', 'accounts'));
-        } else {
-            return abort(401);
+public function index(Request $request, $type)
+{
+    if (Gate::allows('is_admin')) {
+
+        $query = Stocks::query()
+            ->leftJoin('dealers', 'stocks.dealer_id', '=', 'dealers.id')
+            ->select(
+                'stocks.company_name',
+                'stocks.sim_status',
+                'stocks.purchasing_from',
+                'stocks.pushasing_from_name',
+                'stocks.health',
+                'stocks.rom',
+                'stocks.ram',
+                'stocks.activation_status',
+                'stocks.country_status',
+                'stocks.id',
+                'stocks.purchase',
+                'stocks.sale',
+                'stocks.imei1',
+                'stocks.imei2',
+                'stocks.model_name',
+                'stocks.type',
+                'stocks.created_at',
+                'stocks.pta_status',
+                'dealers.bussiness_name as dealer_name'
+            )
+            ->where('stocks.type', $type)
+            ->where('stocks.status', 'Available');
+
+        if ($request->model_name) {
+            $query->where('stocks.model_name', $request->model_name);
         }
+
+        if ($request->company_name) {
+            $query->where('stocks.company_name', $request->company_name);
+        }
+
+        if ($request->imei1) {
+            $query->where('stocks.imei1', $request->imei1);
+        }
+
+        if ($request->pta_status) {
+            $query->where('stocks.pta_status', $request->pta_status);
+        }
+
+        $stocks = $query
+            ->orderBy('stocks.created_at', 'desc')
+            ->paginate(1000);
+
+        $accounts = DB::table('accounts')->get();
+
+        return view('stocks.index', compact('stocks', 'accounts'));
+
+    } else {
+        return abort(401);
     }
+}
+
+
 
     public function view($id)
     {
