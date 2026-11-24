@@ -484,7 +484,7 @@
                 <div class="row mt-3">
                        <!-- SIM Status -->
                     <div class="col-lg-4 col-md-4 col-6">
-                        <label class="fw-bold mb-2 text-dark">SIM Type<span class="text-danger">*</span></label>
+                        <label class="fw-bold mb-2 text-dark">SIM TYPE<span class="text-danger">*</span></label>
 
 <select name="sim_status"
     class="form-select @error('sim_status') is-invalid @enderror" required>

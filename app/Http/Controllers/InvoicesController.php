@@ -89,7 +89,7 @@ class InvoicesController extends Controller
         if (Gate::allows('is_admin')) {
             $invoice = DB::table('invoices')
                 ->join('stocks', 'invoices.stock_id', 'stocks.id')
-                ->select('stocks.company_name', 'stocks.model_name', 'stocks.health', 'stocks.activation_status', 'stocks.pta_status', 'stocks.imei1', 'stocks.imei2', 'stocks.country_status', 'stocks.ram', 'stocks.rom', 'stocks.type', 'invoices.id', 'invoices.invoice_id', 'invoices.buyer_name', 'invoices.buyer_phone', 'invoices.backup', 'invoices.sold_date', 'invoices.total_bill', 'invoices.created_at')
+                ->select('stocks.company_name', 'stocks.model_name', 'stocks.health', 'stocks.activation_status', 'stocks.pta_status', 'stocks.imei1', 'stocks.imei2', 'stocks.country_status', 'stocks.sim_status', 'stocks.ram', 'stocks.rom', 'stocks.type', 'invoices.id', 'invoices.invoice_id', 'invoices.buyer_name', 'invoices.buyer_phone', 'invoices.backup', 'invoices.sold_date', 'invoices.total_bill', 'invoices.created_at')
                 ->where('invoices.id', $id)
                 ->first();
             return view('invoices.view', compact('invoice'));

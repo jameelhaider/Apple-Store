@@ -257,6 +257,10 @@
                                 @endif
                                 <li class="list-group-item"><span class="text-dark fw-bold">Storage / ROM</span> <span
                                         class="text-dark float-end">{{ $invoice->rom }}</span></li>
+                                      @if ($invoice->sim_status)
+                                            <li class="list-group-item"><span class="text-dark fw-bold">Sim Type</span> <span
+                                        class="text-dark float-end">{{ $invoice->sim_status }}</span></li>
+                                      @endif
                                 <li class="list-group-item"><span class="text-dark fw-bold">PTA Status</span> <span
                                         class="text-dark float-end">{{ $invoice->pta_status }}</span></li>
                                 <li class="list-group-item"><span class="text-dark fw-bold">Actication Status</span> <span
