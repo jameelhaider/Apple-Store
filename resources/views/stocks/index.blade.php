@@ -169,13 +169,11 @@
                                     {{ $stock->created_at->format('d M Y') }}</span>
                             </div>
 
-                            {{-- <a href="{{ route('stock.view', ['id' => $stock->id]) }}" class="item-model"
-                                title="View Details">{{ $stock->model_name }}</a> --}}
-                                <a href="{{ route('stock.view', ['id' => $stock->id]) }}"
-   class="item-model"
-   title="View Details">
-    {{ $stock->model_name }}{{ $stock->color ? ' - ' . $stock->color : '' }}
-</a>
+                            <a href="{{ route('stock.view', ['id' => $stock->id]) }}"
+                                class="item-model"
+                                title="View Details">
+                                {{ $stock->model_name }}{{ $stock->color ? ' - ' . $stock->color : '' }}
+                            </a>
 
                             <div class="specs">
                                 <div class="sp"><small>Storage</small><b>{{ $stock->rom ?: '—' }}</b></div>
@@ -328,8 +326,8 @@
                             <div class="col-lg-6 col-6">
                                 <div class="form-group">
                                     <label class="fw-bold text-dark mb-1">Buyer Phone (optional)</label>
-                                    <input type="text" maxlength="12" placeholder="0399-99999999"
-                                        data-inputmask="'mask': '0399-99999999'"
+                                    <input type="text" maxlength="12" inputmode="numeric" autocomplete="off"
+                                        placeholder="0300-1234567"
                                         class="form-control @error('buyer_phone') is-invalid @enderror"
                                         name="buyer_phone" id="buyerPhone">
                                     @error('buyer_phone')
@@ -1446,6 +1444,61 @@
             setTimeout(function() { w.remove(); }, 650);
         });
 
+        /* ---------- buyer phone: always starts with 03 -> 03XX-XXXXXXX (plain JS, no plugins) ---------- */
+        const BUYER_PHONE_PREFIX     = '03';
+        const BUYER_PHONE_MAX_DIGITS = 11;   // 0300-1234567
+        const BUYER_PHONE_DASH_AT    = 4;
+
+        const buyerPhoneField = document.getElementById('buyerPhone');
+
+        function formatBuyerPhone(value) {
+            let d = value.replace(/\D/g, '');
+
+            if (d.startsWith('92')) d = d.substring(2);   // country code
+            if (d.startsWith('0'))  d = d.substring(1);   // leading zero
+            if (d.startsWith('3'))  d = d.substring(1);   // the "3" of "03"
+
+            d = (BUYER_PHONE_PREFIX + d).substring(0, BUYER_PHONE_MAX_DIGITS);
+
+            return d.length > BUYER_PHONE_DASH_AT
+                ? d.substring(0, BUYER_PHONE_DASH_AT) + '-' + d.substring(BUYER_PHONE_DASH_AT)
+                : d;
+        }
+
+        // Enforce the full format only while the buyer fields are visible,
+        // so a hidden (account-filled) phone can never block the submit.
+        function syncBuyerPhoneRules(visible) {
+            if (visible) {
+                buyerPhoneField.setAttribute('pattern', '03\\d{2}-\\d{7}');
+                buyerPhoneField.setAttribute('title', 'Format: 03XX-XXXXXXX');
+            } else {
+                buyerPhoneField.removeAttribute('pattern');
+                buyerPhoneField.removeAttribute('title');
+            }
+        }
+
+        buyerPhoneField.addEventListener('input', function() {
+            buyerPhoneField.value = formatBuyerPhone(buyerPhoneField.value);
+        });
+
+        // Show the "03" prefix as soon as the field is focused
+        buyerPhoneField.addEventListener('focus', function() {
+            if (buyerPhoneField.value === '') {
+                buyerPhoneField.value = BUYER_PHONE_PREFIX;
+                setTimeout(function() {
+                    const len = buyerPhoneField.value.length;
+                    try { buyerPhoneField.setSelectionRange(len, len); } catch (e) {}
+                }, 0);
+            }
+        });
+
+        // Phone is optional: if only the bare prefix is left, clear it again
+        buyerPhoneField.addEventListener('blur', function() {
+            if (buyerPhoneField.value === BUYER_PHONE_PREFIX) buyerPhoneField.value = '';
+        });
+
+        syncBuyerPhoneRules(false); // buyer fields start hidden
+
         /* ---------- mark as sold modal ---------- */
         function getSoldModal() {
             const el = document.getElementById('markAsSoldModal');
@@ -1479,16 +1532,19 @@
                 buyerName.value = '';
                 buyerPhone.value = '';
                 buyerName.required = true;
+                syncBuyerPhoneRules(true);
             } else if (this.value) {
                 buyerFields.style.display = 'none';
                 buyerName.value = opt.dataset.name || '';
                 buyerPhone.value = opt.dataset.phone || '';
                 buyerName.required = false;
+                syncBuyerPhoneRules(false);
             } else {
                 buyerFields.style.display = 'flex';
                 buyerName.value = '';
                 buyerPhone.value = '';
                 buyerName.required = false;
+                syncBuyerPhoneRules(true);
             }
         });
 
@@ -1590,7 +1646,7 @@
             });
         });
 
-        /* ---------- plugins (inputmask + select2) ---------- */
+        /* ---------- plugins (select2 only) ---------- */
         (function() {
             function loadScript(src, cb) {
                 const s = document.createElement('script');
@@ -1601,12 +1657,9 @@
 
             function initPlugins() {
                 const $ = window.jQuery;
-                if (!$) return;
-                if ($.fn.inputmask) $(':input[data-inputmask]').inputmask();
-                if ($.fn.select2) {
-                    $('#model-select').select2({ placeholder: 'Select Model', allowClear: true });
-                    $('#company-select').select2({ placeholder: 'Select Company', allowClear: true });
-                }
+                if (!$ || !$.fn.select2) return;
+                $('#model-select').select2({ placeholder: 'Select Model', allowClear: true });
+                $('#company-select').select2({ placeholder: 'Select Company', allowClear: true });
             }
 
             function withSelect2() {

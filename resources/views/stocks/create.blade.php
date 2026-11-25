@@ -1,700 +1,391 @@
-@php
-    $action = request()->routeIs('stock.edit') ? 'Edit Stock' : 'Add New Stock';
+@extends('dashboard.master2')
 
-    $title = match (request()->type) {
-        'apple' => "$action | Apple Phones",
+@php
+    /*
+    |--------------------------------------------------------------------------
+    | View state
+    |--------------------------------------------------------------------------
+    */
+    $type    = request()->type;                       // 'apple' | 'others'
+    $isApple = $type === 'apple';
+    $isOther = $type === 'others';
+    $isEdit  = $stock->id !== null;
+
+    $action = request()->routeIs('stock.edit') ? 'Edit Stock' : 'Add New Stock';
+    $title  = match ($type) {
+        'apple'  => "$action | Apple Phones",
         'others' => "$action | Other Phones",
-        default => 'Title Not Found',
+        default  => 'Title Not Found',
     };
+
+    $formAction = $isEdit
+        ? route('update.stock', ['id' => $stock->id])
+        : route('submit.stock');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Helpers
+    |--------------------------------------------------------------------------
+    */
+    // Current value: old input first, then the model.
+    $val = fn(string $field) => old($field, $stock->$field);
+
+    // "selected" attribute for <option>.
+    $sel = fn(string $field, $value) => $val($field) == $value ? 'selected' : '';
+
+    /*
+    |--------------------------------------------------------------------------
+    | Option lists
+    |--------------------------------------------------------------------------
+    */
+    $romOptions = ['1 GB', '2 GB', '4 GB', '8 GB', '16 GB', '32 GB', '64 GB', '128 GB', '256 GB', '512 GB', '1 TB', '2 TB'];
+
+    $ramOptions = ['128 MB', '256 MB', '512 MB', '1 GB', '1.5 GB', '2 GB', '3 GB', '4 GB', '6 GB', '8 GB', '12 GB', '16 GB', '18 GB', '24 GB'];
+
+    $ptaOptions = array_merge(
+        ['Official Approved'],
+        $isOther ? ['Patch Approved', 'CPID Approved'] : [],
+        ['Not Approved', 'Not Approved (4 months remaining)', 'Not Approved (2 months remaining)']
+    );
+
+    $activationOptions = ['Active', 'Non Active'];
+
+    $countryOptions = $isApple ? ['JV', 'Factory'] : ['Yes', 'No'];
+
+    $simOptions = ['Single Physical SIM', 'Dual Physical SIM', 'Single eSIM', 'Dual eSIM', 'Physical SIM + eSIM'];
+
+    $purchasingFromOptions = ['Local', 'Dealer'];
+
+    // TIP: move this map into a helper (e.g. iphone_colors()) next to iphone_models().
+    $iphoneColors = [
+        // Black
+        'Black' => '#000000', 'Space Black' => '#292929', 'Jet Black' => '#050505', 'Graphite' => '#414141',
+        'Space Gray' => '#535353', 'Midnight' => '#191E2A', 'Midnight Black' => '#101010',
+        'Onyx Black' => '#353839', 'Matte Black' => '#222222',
+        // White / Silver
+        'White' => '#FFFFFF', 'Silver' => '#C0C0C0', 'Starlight' => '#F0E5D3', 'Star White' => '#F5F5F0',
+        'Cloud White' => '#F4F3EF', 'White Titanium' => '#E5E5E0', 'Glacier' => '#DCE7EA',
+        'Cream' => '#FFFDD0', 'Ivory' => '#FFFFF0',
+        // Gold
+        'Gold' => '#D4AF37', 'Rose Gold' => '#B76E79', 'Champagne Gold' => '#E7C27D', 'Light Gold' => '#D9C5A3',
+        // Red
+        'Red' => '#D70018', 'PRODUCT RED' => '#C8102E', 'Red (PRODUCT RED)' => '#C8102E', 'Burgundy' => '#800020',
+        'Wine Red' => '#722F37', 'Dark Red' => '#8B0000', 'Coral' => '#FF7F50',
+        // Pink
+        'Pink' => '#F5A9BC', 'Soft Pink' => '#F4C2C2', 'Rose Pink' => '#F4C2C2', 'Light Pink' => '#FFB6C1',
+        // Blue
+        'Blue' => '#4A90E2', 'Deep Blue' => '#173B65', 'Dark Blue' => '#00008B', 'Light Blue' => '#ADD8E6',
+        'Midnight Blue' => '#191970', 'Pacific Blue' => '#345B75', 'Sierra Blue' => '#A9C3D5',
+        'Blue Titanium' => '#526477', 'Ultramarine' => '#4B54C8', 'Sky Blue' => '#87CEEB',
+        'Mist Blue' => '#A9C9D5', 'Space Blue' => '#3A5A78',
+        // Green
+        'Green' => '#5E8C61', 'Alpine Green' => '#53665A', 'Midnight Green' => '#45564B', 'Sage' => '#A3AC91',
+        'Teal' => '#008C95', 'Mint' => '#BDECC8', 'Light Green' => '#90EE90', 'Dark Green' => '#006400',
+        'Olive Green' => '#808000',
+        // Yellow / Orange
+        'Yellow' => '#F9D849', 'Orange' => '#FFA500', 'Cosmic Orange' => '#F47A38',
+        // Purple
+        'Purple' => '#A88BC5', 'Deep Purple' => '#594267', 'Lavender' => '#C8A2C8', 'Violet' => '#8F00FF',
+        // Titanium
+        'Titanium' => '#878681', 'Natural Titanium' => '#A7A49B', 'Black Titanium' => '#373737',
+        'Desert Titanium' => '#BFA58A',
+        // Other
+        'Brown' => '#8B4513', 'Tan' => '#D2B48C', 'Rose' => '#FF007F', 'Gray' => '#808080', 'Grey' => '#808080',
+    ];
 @endphp
 
-@extends('dashboard.master2')
 @section('admin_title', $title)
+
 @section('content2')
-
-
-
     <div class="container-fluid px-3">
 
+        {{-- ============================== Page header ============================== --}}
         <div class="card shadow-sm bg-white rounded-0">
             <div class="row">
-                <div class="col-lg-2 col-md-3 col-6 col-sm-4">
-                    <a href="{{ route('stock.index', ['type' => request()->type]) }}"
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                    <a href="{{ route('stock.index', ['type' => $type]) }}"
                         class="btn btn-dark custom-back-button d-flex align-items-center justify-content-center">
                         <i class="bx bx-chevron-left me-1"></i> Back
                     </a>
                 </div>
                 <div class="col-lg-10 col-md-9 col-sm-8 col-6">
-                    <h3 class="mt-1 d-none d-md-block d-lg-block" style="font-family:cursive">
-                        {{ $title }}
-                    </h3>
-                    <h5 class="mt-1 d-block d-md-none d-lg-none" style="font-family:cursive">
-                        {{ $title }}
-                    </h5>
+                    <h3 class="mt-1 d-none d-md-block" style="font-family: cursive">{{ $title }}</h3>
+                    <h5 class="mt-1 d-block d-md-none" style="font-family: cursive">{{ $title }}</h5>
                 </div>
             </div>
         </div>
 
-
-        <style>
-            .custom-back-button {
-                font-size: 16px;
-                height: 100%;
-                width: 100%;
-                border-radius: 0;
-                text-decoration: none;
-                transition: all 0.3s ease;
-                font-weight: 500;
-            }
-
-            .custom-back-button:hover {
-                background-color: #314861;
-            }
-
-            .custom-back-button i {
-                font-size: 18px;
-            }
-        </style>
-
-
+        {{-- ================================== Form ================================== --}}
         <div class="card p-3 mt-3">
-            <form action="{{ $stock->id != null ? route('update.stock', ['id' => $stock->id]) : route('submit.stock') }}"
-                method="POST">
+            <form action="{{ $formAction }}" method="POST">
                 @csrf
-                <input type="hidden" name="type" value="{{ request()->type }}">
-                @if (request()->type == 'apple')
+                <input type="hidden" name="type" value="{{ $type }}">
+                @if ($isApple)
                     <input type="hidden" name="company_name" value="Apple">
                 @endif
 
-
-
-
-
+                {{-- ---------------------------- Purchasing source ---------------------------- --}}
                 <div class="row">
-                    <!-- Purchasing From -->
                     <div class="col-lg-4 col-md-4">
                         <label class="fw-bold mb-2 text-dark">PURCHASING FROM<span class="text-danger">*</span></label>
-                        <select name="purchasing_from" class="form-select @error('purchasing_from') is-invalid @enderror"
-                            id="purchasing-from" required>
+                        <select name="purchasing_from" id="purchasing-from" required
+                            class="form-select @error('purchasing_from') is-invalid @enderror">
                             <option value="">Select Option</option>
-                            <option value="Local"
-                                {{ old('purchasing_from', $stock->purchasing_from) == 'Local' ? 'selected' : '' }}>Local
-                            </option>
-                            <option value="Dealer"
-                                {{ old('purchasing_from', $stock->purchasing_from) == 'Dealer' ? 'selected' : '' }}>Dealer
-                            </option>
+                            @foreach ($purchasingFromOptions as $option)
+                                <option value="{{ $option }}" {{ $sel('purchasing_from', $option) }}>{{ $option }}</option>
+                            @endforeach
                         </select>
                         @error('purchasing_from')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
-                    <!-- Dealer Information -->
-                    <div class="col-lg-4 col-md-4" id="DealerInformation" style="display:none;">
+
+                    {{-- Dealer (shown when "Dealer") --}}
+                    <div class="col-lg-4 col-md-4" id="dealer-information" style="display: none;">
                         <label class="fw-bold mb-2 text-dark">SELECT DEALER<span class="text-danger">*</span></label>
                         <select name="dealer_id" id="dealer-select"
                             class="form-select @error('dealer_id') is-invalid @enderror">
                             <option value="">Select Dealer</option>
                             @foreach ($dealers as $dealer)
-                                <option value="{{ $dealer->id }}"
-                                    {{ old('dealer_id', $stock->dealer_id) == $dealer->id ? 'selected' : '' }}>
-                                    {{ $dealer->name . ' ( ' . $dealer->bussiness_name . ' )' }}
+                                <option value="{{ $dealer->id }}" {{ $sel('dealer_id', $dealer->id) }}>
+                                    {{ $dealer->name }} ( {{ $dealer->bussiness_name }} )
                                 </option>
                             @endforeach
                         </select>
                         @error('dealer_id')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
-
                 </div>
 
-
-                <div id="SellerInformation" style="display:none;">
+                {{-- ---------------------- Seller information (shown when "Local") ---------------------- --}}
+                <div id="seller-information" style="display: none;">
                     <div class="row mt-4">
                         <hr>
                         <h4 class="fw-bold mb-3 text-dark">Seller Information</h4>
                         <hr>
 
-                        {{-- Name --}}
                         <div class="col-lg-4 col-md-4 col-6">
                             <label class="fw-bold mb-2 text-dark">NAME<span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Name"
-                                value="{{ old('pushasing_from_name', $stock->pushasing_from_name) }}"
-                                class="form-control @error('pushasing_from_name') is-invalid @enderror"
-                                name="pushasing_from_name" id="name-field">
+                            <input type="text" name="pushasing_from_name" id="name-field" placeholder="Name"
+                                value="{{ $val('pushasing_from_name') }}"
+                                class="form-control @error('pushasing_from_name') is-invalid @enderror">
                             @error('pushasing_from_name')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
 
-                        {{-- Phone --}}
                         <div class="col-lg-4 col-md-4 col-6">
                             <label class="fw-bold mb-2 text-dark">PHONE<span class="text-danger">*</span></label>
-                            <input type="text" maxlength="12" placeholder="0399-99999999"
-                                data-inputmask="'mask': '0399-99999999'"
-                                value="{{ old('pushasing_from_phone', $stock->pushasing_from_phone) }}"
-                                class="form-control @error('pushasing_from_phone') is-invalid @enderror"
-                                name="pushasing_from_phone" id="phone-field">
+                            <input type="text" name="pushasing_from_phone" id="phone-field" maxlength="12" inputmode="numeric" autocomplete="off"
+                                pattern="03\d{2}-\d{7}" title="Format: 03XX-XXXXXXX"
+                                placeholder="0300-1234567" value="{{ $val('pushasing_from_phone') }}"
+                                class="form-control @error('pushasing_from_phone') is-invalid @enderror">
                             @error('pushasing_from_phone')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
 
-                        {{-- CNIC --}}
                         <div class="col-lg-4 col-md-4">
                             <label class="fw-bold mb-2 text-dark">CNIC<span class="text-danger">*</span></label>
-                            <input type="text" data-inputmask="'mask': '99999-9999999-9'" placeholder="XXXXX-XXXXXXX-X"
-                                value="{{ old('pushasing_from_cnic', $stock->pushasing_from_cnic) }}"
-                                class="form-control @error('pushasing_from_cnic') is-invalid @enderror"
-                                name="pushasing_from_cnic" id="cnic-field">
+                            <input type="text" name="pushasing_from_cnic" id="cnic-field" maxlength="15" inputmode="numeric" autocomplete="off"
+                                pattern="\d{5}-\d{7}-\d" title="Format: XXXXX-XXXXXXX-X"
+                                placeholder="XXXXX-XXXXXXX-X" value="{{ $val('pushasing_from_cnic') }}"
+                                class="form-control @error('pushasing_from_cnic') is-invalid @enderror">
                             @error('pushasing_from_cnic')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
 
-                        {{-- Address --}}
                         <div class="col-lg-4 col-md-4 mt-3">
                             <label class="fw-bold mb-2 text-dark">ADDRESS (Optional)</label>
-                            <textarea name="pushasing_from_address" placeholder="Address"
-                                class="form-control @error('pushasing_from_address') is-invalid @enderror" id="address-field" cols="30"
-                                rows="3">{{ old('pushasing_from_address', $stock->pushasing_from_address) }}</textarea>
+                            <textarea name="pushasing_from_address" id="address-field" rows="3" placeholder="Address"
+                                class="form-control @error('pushasing_from_address') is-invalid @enderror">{{ $val('pushasing_from_address') }}</textarea>
                             @error('pushasing_from_address')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
-
                     </div>
                 </div>
 
-
-
-
-
-
+                {{-- ------------------------------ Stock information ------------------------------ --}}
                 <div class="row mt-3">
                     <hr>
                     <h4 class="fw-bold text-dark mb-3">Stock Information</h4>
                     <hr>
                 </div>
 
-
-
-
+                {{-- Model / Company --}}
                 <div class="row">
-                    @if (request()->type == 'apple')
+                    @if ($isApple)
                         <div class="col-lg-8 col-md-8 col-12">
-                            <label for="" class="fw-bold mb-2 text-dark">SELECT MODEL<span
-                                    class="text-danger">*</span></label>
-
-
-
+                            <label class="fw-bold mb-2 text-dark">SELECT MODEL<span class="text-danger">*</span></label>
                             <select name="model_name" id="model-select" required
                                 class="form-select @error('model_name') is-invalid @enderror">
                                 <option value="">Select iPhone Model</option>
-
                                 @foreach (iphone_models() as $model)
-                                    <option value="{{ $model }}"
-                                        {{ old('model_name', $stock->model_name) == $model ? 'selected' : '' }}>
-                                        {{ $model }}
-                                    </option>
+                                    <option value="{{ $model }}" {{ $sel('model_name', $model) }}>{{ $model }}</option>
                                 @endforeach
                             </select>
-
-
-
-
-
-
                             @error('model_name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
                     @endif
 
-
-
-                    @if (request()->type == 'others')
+                    @if ($isOther)
                         <div class="col-lg-4 col-md-4 col-6">
-                            <label for="" class="fw-bold mb-2 text-dark">SELECT COMPANY<span
-                                    class="text-danger">*</span></label>
-
+                            <label class="fw-bold mb-2 text-dark">SELECT COMPANY<span class="text-danger">*</span></label>
                             <select name="company_name" id="company-select" required
                                 class="form-select @error('company_name') is-invalid @enderror">
                                 <option value="">Select Company</option>
-
                                 @foreach (other_companies() as $company)
-                                    <option value="{{ $company }}"
-                                        {{ old('company_name', $stock->company_name) == $company ? 'selected' : '' }}>
-                                        {{ $company }}
-                                    </option>
+                                    <option value="{{ $company }}" {{ $sel('company_name', $company) }}>{{ $company }}</option>
                                 @endforeach
                             </select>
-                            @error('model_name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                            @error('company_name')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
-
 
                         <div class="col-lg-4 col-md-4 col-6">
-                            <label for="" class="fw-bold mb-2 text-dark">Model Name<span
-                                    class="text-danger">*</span></label>
-                            <input type="text" required placeholder="Model Name" name="model_name"
-                                value="{{ old('model_name', $stock->model_name) }}"
+                            <label class="fw-bold mb-2 text-dark">Model Name<span class="text-danger">*</span></label>
+                            <input type="text" name="model_name" required placeholder="Model Name"
+                                value="{{ $val('model_name') }}"
                                 class="form-control @error('model_name') is-invalid @enderror">
                             @error('model_name')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
-
-
                     @endif
-
-
                 </div>
 
-
-
+                {{-- IMEI --}}
                 <div class="row mt-3">
-                    <!-- IMEI -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">IMEI 1<span class="text-danger">*</span></label>
-                        <input type="text" pattern="\d{15}" maxlength="15" required placeholder="IMEI"
-                            name="imei1" value="{{ old('imei1', $stock->imei1) }}"
-                            class="form-control @error('imei1') is-invalid @enderror">
+                        <input type="text" name="imei1" pattern="\d{15}" maxlength="15" required placeholder="IMEI"
+                            value="{{ $val('imei1') }}" class="form-control @error('imei1') is-invalid @enderror">
                         @error('imei1')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
 
-                    <!-- IMEI 2 -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">IMEI 2 (Optional)</label>
-                        <input type="text" pattern="\d{15}" maxlength="15" placeholder="IMEI 2" name="imei2"
-                            value="{{ old('imei2', $stock->imei2) }}"
-                            class="form-control @error('imei2') is-invalid @enderror">
+                        <input type="text" name="imei2" pattern="\d{15}" maxlength="15" placeholder="IMEI 2"
+                            value="{{ $val('imei2') }}" class="form-control @error('imei2') is-invalid @enderror">
                         @error('imei2')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
                 </div>
 
-
-
+                {{-- Storage + (Battery & Color | RAM) --}}
                 <div class="row mt-3">
-
-
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">Storage / ROM<span class="text-danger">*</span></label>
-                        <select name="rom" required id="rom-select"
+                        <select name="rom" id="rom-select" required
                             class="form-select @error('rom') is-invalid @enderror">
                             <option value="">Select Option</option>
-                            <option value="1 GB" {{ old('rom', $stock->rom) == '1 GB' ? 'selected' : '' }}>1 GB</option>
-                            <option value="2 GB" {{ old('rom', $stock->rom) == '2 GB' ? 'selected' : '' }}>2 GB</option>
-                            <option value="4 GB" {{ old('rom', $stock->rom) == '4 GB' ? 'selected' : '' }}>4 GB</option>
-                            <option value="8 GB" {{ old('rom', $stock->rom) == '8 GB' ? 'selected' : '' }}>8 GB</option>
-                            <option value="16 GB" {{ old('rom', $stock->rom) == '16 GB' ? 'selected' : '' }}>16 GB
-                            </option>
-                            <option value="32 GB" {{ old('rom', $stock->rom) == '32 GB' ? 'selected' : '' }}>32 GB
-                            </option>
-                            <option value="64 GB" {{ old('rom', $stock->rom) == '64 GB' ? 'selected' : '' }}>64 GB
-                            </option>
-                            <option value="128 GB" {{ old('rom', $stock->rom) == '128 GB' ? 'selected' : '' }}>128 GB
-                            </option>
-                            <option value="256 GB" {{ old('rom', $stock->rom) == '256 GB' ? 'selected' : '' }}>256 GB
-                            </option>
-                            <option value="512 GB" {{ old('rom', $stock->rom) == '512 GB' ? 'selected' : '' }}>512 GB
-                            </option>
-                            <option value="1 TB" {{ old('rom', $stock->rom) == '1 TB' ? 'selected' : '' }}>1 TB
-                            </option>
-                            <option value="2 TB" {{ old('rom', $stock->rom) == '2 TB' ? 'selected' : '' }}>2 TB
-                            </option>
+                            @foreach ($romOptions as $option)
+                                <option value="{{ $option }}" {{ $sel('rom', $option) }}>{{ $option }}</option>
+                            @endforeach
                         </select>
                         @error('rom')
                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
 
-
-                    @if (request()->type == 'apple')
+                    @if ($isApple)
                         <div class="col-lg-4 col-md-4 col-6">
-                            <label for="" class="fw-bold mb-2 text-dark">BATTERY HEALTH<span
-                                    class="text-danger">*</span></label>
-                            <input type="number" required min="1" max="100" placeholder="Battery Health"
-                                name="health" value="{{ old('health', $stock->health) }}"
+                            <label class="fw-bold mb-2 text-dark">BATTERY HEALTH<span class="text-danger">*</span></label>
+                            <input type="number" name="health" min="1" max="100" required
+                                placeholder="Battery Health" value="{{ $val('health') }}"
                                 class="form-control @error('health') is-invalid @enderror">
                             @error('health')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
 
+                        <div class="col-lg-4 col-md-4 col-6">
+                            <label class="fw-bold mb-2 text-dark">COLOR<span class="text-danger">*</span></label>
+                            <select name="color" id="color-select" required
+                                class="form-select @error('color') is-invalid @enderror">
+                                <option value="">Select Color</option>
+                                @foreach ($iphoneColors as $colorName => $colorHex)
+                                    <option value="{{ $colorName }}" {{ $sel('color', $colorName) }}>{{ $colorName }}</option>
+                                @endforeach
+                            </select>
+                            @error('color')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                            @enderror
 
-<div class="col-lg-4 col-md-4 col-6">
-
-    <label class="fw-bold mb-2 text-dark">
-        COLOR <span class="text-danger">*</span>
-    </label>
-
-    @php
-        // Apple iPhone colors + additional inventory shades
-        $iphoneColors = [
-            // Black shades
-            'Black' => '#000000',
-            'Space Black' => '#292929',
-            'Jet Black' => '#050505',
-            'Graphite' => '#414141',
-            'Space Gray' => '#535353',
-            'Midnight' => '#191E2A',
-            'Midnight Black' => '#101010',
-            'Onyx Black' => '#353839',
-            'Matte Black' => '#222222',
-
-            // White and silver shades
-            'White' => '#FFFFFF',
-            'Silver' => '#C0C0C0',
-            'Starlight' => '#F0E5D3',
-            'Star White' => '#F5F5F0',
-            'Cloud White' => '#F4F3EF',
-            'White Titanium' => '#E5E5E0',
-            'Glacier' => '#DCE7EA',
-            'Cream' => '#FFFDD0',
-            'Ivory' => '#FFFFF0',
-
-            // Gold shades
-            'Gold' => '#D4AF37',
-            'Rose Gold' => '#B76E79',
-            'Champagne Gold' => '#E7C27D',
-            'Light Gold' => '#D9C5A3',
-
-            // Red shades
-            'Red' => '#D70018',
-            'PRODUCT RED' => '#C8102E',
-            'Red (PRODUCT RED)' => '#C8102E',
-            'Burgundy' => '#800020',
-            'Wine Red' => '#722F37',
-            'Dark Red' => '#8B0000',
-            'Coral' => '#FF7F50',
-
-            // Pink shades
-            'Pink' => '#F5A9BC',
-            'Soft Pink' => '#F4C2C2',
-            'Rose Pink' => '#F4C2C2',
-            'Light Pink' => '#FFB6C1',
-
-            // Blue shades
-            'Blue' => '#4A90E2',
-            'Deep Blue' => '#173B65',
-            'Dark Blue' => '#00008B',
-            'Light Blue' => '#ADD8E6',
-            'Midnight Blue' => '#191970',
-            'Pacific Blue' => '#345B75',
-            'Sierra Blue' => '#A9C3D5',
-            'Blue Titanium' => '#526477',
-            'Ultramarine' => '#4B54C8',
-            'Sky Blue' => '#87CEEB',
-            'Mist Blue' => '#A9C9D5',
-            'Space Blue' => '#3A5A78',
-
-            // Green shades
-            'Green' => '#5E8C61',
-            'Alpine Green' => '#53665A',
-            'Midnight Green' => '#45564B',
-            'Sage' => '#A3AC91',
-            'Teal' => '#008C95',
-            'Mint' => '#BDECC8',
-            'Light Green' => '#90EE90',
-            'Dark Green' => '#006400',
-            'Olive Green' => '#808000',
-
-            // Yellow and orange shades
-            'Yellow' => '#F9D849',
-            'Orange' => '#FFA500',
-            'Cosmic Orange' => '#F47A38',
-
-            // Purple shades
-            'Purple' => '#A88BC5',
-            'Deep Purple' => '#594267',
-            'Lavender' => '#C8A2C8',
-            'Violet' => '#8F00FF',
-
-            // Titanium finishes
-            'Titanium' => '#878681',
-            'Natural Titanium' => '#A7A49B',
-            'Black Titanium' => '#373737',
-            'Desert Titanium' => '#BFA58A',
-
-            // Other shades
-            'Brown' => '#8B4513',
-            'Tan' => '#D2B48C',
-            'Rose' => '#FF007F',
-            'Gray' => '#808080',
-            'Grey' => '#808080',
-        ];
-
-        $selectedColor = old('color', $stock->color ?? '');
-    @endphp
-
-    <select
-        name="color"
-        id="color-select"
-        required
-        class="form-select @error('color') is-invalid @enderror"
-        onchange="updateIphoneColorPreview(this.value)"
-    >
-        <option value="">Select Color</option>
-
-        @foreach($iphoneColors as $colorName => $colorCode)
-            <option
-                value="{{ $colorName }}"
-                {{ $selectedColor == $colorName ? 'selected' : '' }}
-            >
-                {{ $colorName }}
-            </option>
-        @endforeach
-    </select>
-
-    @error('color')
-        <span class="invalid-feedback" role="alert">
-            <strong>{{ $message }}</strong>
-        </span>
-    @enderror
-
-    {{-- LIVE COLOR PREVIEW --}}
-    <div id="iphone-color-preview"
-         class="mt-3 p-2 rounded border d-flex align-items-center"
-         style="gap: 12px; display: none !important;">
-
-        <div id="iphone-color-circle"
-             style="
-                width: 38px;
-                height: 38px;
-                min-width: 38px;
-                border-radius: 50%;
-                border: 2px solid #999;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-             ">
-        </div>
-
-        <div>
-            <div class="small text-muted">Selected Color</div>
-            <div id="iphone-color-name" class="fw-bold text-dark"></div>
-        </div>
-
-    </div>
-
-</div>
-
-<script>
-    // Apple iPhone color preview
-    const iphoneColorPreviewMap = @json($iphoneColors);
-
-    function updateIphoneColorPreview(color) {
-
-        const preview = document.getElementById('iphone-color-preview');
-        const circle = document.getElementById('iphone-color-circle');
-        const name = document.getElementById('iphone-color-name');
-
-        if (!preview || !circle || !name) return;
-
-        const hex = iphoneColorPreviewMap[color];
-
-        if (!color || !hex) {
-            preview.style.setProperty('display', 'none', 'important');
-            return;
-        }
-
-        preview.style.setProperty('display', 'flex', 'important');
-
-        circle.style.backgroundColor = hex;
-        name.textContent = color;
-
-        // Border for lighter colors
-        const lightColors = [
-            'White',
-            'Silver',
-            'Starlight',
-            'Star White',
-            'Cloud White',
-            'White Titanium',
-            'Cream',
-            'Ivory',
-            'Light Pink',
-            'Pink',
-            'Soft Pink',
-            'Mint',
-            'Light Blue',
-            'Sky Blue',
-            'Mist Blue',
-            'Yellow',
-            'Light Green'
-        ];
-
-        circle.style.borderColor = lightColors.includes(color)
-            ? '#999999'
-            : '#cccccc';
-    }
-
-    // Load existing or previously selected color
-    document.addEventListener('DOMContentLoaded', function () {
-        const select = document.getElementById('color-select');
-
-        if (select) {
-            updateIphoneColorPreview(select.value);
-        }
-    });
-
-    // Also initialize immediately if the script runs after the HTML
-    updateIphoneColorPreview(@json($selectedColor));
-</script>
-
+                            {{-- Live colour preview --}}
+                            <div id="color-preview" class="mt-3 p-2 rounded border align-items-center d-none"
+                                style="gap: 12px;">
+                                <div id="color-circle" class="color-circle"></div>
+                                <div>
+                                    <div class="small text-muted">Selected Color</div>
+                                    <div id="color-name" class="fw-bold text-dark"></div>
+                                </div>
+                            </div>
+                        </div>
                     @else
                         <div class="col-lg-4 col-md-4 col-6">
                             <label class="fw-bold mb-2 text-dark">RAM<span class="text-danger">*</span></label>
-                            <select name="ram" required id="ram-select"
+                            <select name="ram" id="ram-select" required
                                 class="form-select @error('ram') is-invalid @enderror">
                                 <option value="">Select Option</option>
-                                <option value="128 MB" {{ old('ram', $stock->ram) == '128 MB' ? 'selected' : '' }}>128 MB
-                                </option>
-                                <option value="256 MB" {{ old('ram', $stock->ram) == '256 MB' ? 'selected' : '' }}>256 MB
-                                </option>
-                                <option value="512 MB" {{ old('ram', $stock->ram) == '512 MB' ? 'selected' : '' }}>512 MB
-                                </option>
-                                <option value="1 GB" {{ old('ram', $stock->ram) == '1 GB' ? 'selected' : '' }}>1 GB
-                                </option>
-                                <option value="1.5 GB" {{ old('ram', $stock->ram) == '1.5 GB' ? 'selected' : '' }}>1.5 GB
-                                </option>
-                                <option value="2 GB" {{ old('ram', $stock->ram) == '2 GB' ? 'selected' : '' }}>2 GB
-                                </option>
-                                <option value="3 GB" {{ old('ram', $stock->ram) == '3 GB' ? 'selected' : '' }}>3 GB
-                                </option>
-                                <option value="4 GB" {{ old('ram', $stock->ram) == '4 GB' ? 'selected' : '' }}>4 GB
-                                </option>
-                                <option value="6 GB" {{ old('ram', $stock->ram) == '6 GB' ? 'selected' : '' }}>6 GB
-                                </option>
-                                <option value="8 GB" {{ old('ram', $stock->ram) == '8 GB' ? 'selected' : '' }}>8 GB
-                                </option>
-                                <option value="12 GB" {{ old('ram', $stock->ram) == '12 GB' ? 'selected' : '' }}>12 GB
-                                </option>
-                                <option value="16 GB" {{ old('ram', $stock->ram) == '16 GB' ? 'selected' : '' }}>16 GB
-                                </option>
-                                <option value="18 GB" {{ old('ram', $stock->ram) == '18 GB' ? 'selected' : '' }}>18 GB
-                                </option>
-                                <option value="24 GB" {{ old('ram', $stock->ram) == '24 GB' ? 'selected' : '' }}>24 GB
-                                </option>
+                                @foreach ($ramOptions as $option)
+                                    <option value="{{ $option }}" {{ $sel('ram', $option) }}>{{ $option }}</option>
+                                @endforeach
                             </select>
                             @error('ram')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
                         </div>
                     @endif
-
-
-
-
-
                 </div>
 
-
-
+                {{-- PTA / Activation / Country lock --}}
                 <div class="row mt-3">
-                    <!-- PTA Status -->
                     <div class="col-lg-4 col-md-4 col-12">
                         <label class="fw-bold mb-2 text-dark">PTA STATUS<span class="text-danger">*</span></label>
-                        <select name="pta_status" class="form-select @error('pta_status') is-invalid @enderror" required>
+                        <select name="pta_status" required
+                            class="form-select @error('pta_status') is-invalid @enderror">
                             <option value="">Select Option</option>
-                            <option value="Official Approved"
-                                {{ old('pta_status', $stock->pta_status) == 'Official Approved' ? 'selected' : '' }}>
-                                Official Approved
-                            </option>
-                            @if (request()->type == 'others')
-                                <option value="Patch Approved"
-                                    {{ old('pta_status', $stock->pta_status) == 'Patch Approved' ? 'selected' : '' }}>
-                                    Patch
-                                    Approved</option>
-                                <option value="CPID Approved"
-                                    {{ old('pta_status', $stock->pta_status) == 'CPID Approved' ? 'selected' : '' }}>CPID
-                                    Approved</option>
-                            @endif
-                            <option value="Not Approved"
-                                {{ old('pta_status', $stock->pta_status) == 'Not Approved' ? 'selected' : '' }}>Not
-                                Approved</option>
-                            <option value="Not Approved (4 months remaining)"
-                                {{ old('pta_status', $stock->pta_status) == 'Not Approved (4 months remaining)' ? 'selected' : '' }}>
-                                Not Approved (4 months remaining)</option>
-                            <option value="Not Approved (2 months remaining)"
-                                {{ old('pta_status', $stock->pta_status) == 'Not Approved (2 months remaining)' ? 'selected' : '' }}>
-                                Not Approved (2 months remaining)</option>
-
-
-
+                            @foreach ($ptaOptions as $option)
+                                <option value="{{ $option }}" {{ $sel('pta_status', $option) }}>{{ $option }}</option>
+                            @endforeach
                         </select>
                         @error('pta_status')
                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
 
-                    <!-- Activation Status -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">ACTIVATION STATUS<span class="text-danger">*</span></label>
-                        <select name="activation_status"
-                            class="form-select @error('activation_status') is-invalid @enderror" required>
+                        <select name="activation_status" required
+                            class="form-select @error('activation_status') is-invalid @enderror">
                             <option value="">Select Option</option>
-                            <option value="Active"
-                                {{ old('activation_status', $stock->activation_status) == 'Active' ? 'selected' : '' }}>
-                                Active
-                            </option>
-                            <option value="Non Active"
-                                {{ old('activation_status', $stock->activation_status) == 'Non Active' ? 'selected' : '' }}>
-                                Non
-                                Active</option>
+                            @foreach ($activationOptions as $option)
+                                <option value="{{ $option }}" {{ $sel('activation_status', $option) }}>{{ $option }}</option>
+                            @endforeach
                         </select>
                         @error('activation_status')
                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
 
-                    <!-- Country Locked -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">COUNTRY LOCKED?<span class="text-danger">*</span></label>
-                        <select name="country_status" class="form-select @error('country_status') is-invalid @enderror"
-                            required>
+                        <select name="country_status" required
+                            class="form-select @error('country_status') is-invalid @enderror">
                             <option value="">Select Option</option>
-
-
-                            @if (request()->type == 'apple')
-                                <option value="JV"
-                                    {{ old('country_status', $stock->country_status) == 'JV' ? 'selected' : '' }}>JV
-                                </option>
-                                <option value="Factory"
-                                    {{ old('country_status', $stock->country_status) == 'Factory' ? 'selected' : '' }}>
-                                    Factory
-                                </option>
-                            @endif
-
-                            @if (request()->type == 'others')
-                                <option value="Yes"
-                                    {{ old('country_status', $stock->country_status) == 'Yes' ? 'selected' : '' }}>Yes
-                                </option>
-                                <option value="No"
-                                    {{ old('country_status', $stock->country_status) == 'No' ? 'selected' : '' }}>No
-                                </option>
-                            @endif
-
+                            @foreach ($countryOptions as $option)
+                                <option value="{{ $option }}" {{ $sel('country_status', $option) }}>{{ $option }}</option>
+                            @endforeach
                         </select>
                         @error('country_status')
                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
@@ -702,104 +393,88 @@
                     </div>
                 </div>
 
-
-
-
+                {{-- SIM / Prices --}}
                 <div class="row mt-3">
-                    <!-- SIM Status -->
                     <div class="col-lg-4 col-md-4 col-6">
                         <label class="fw-bold mb-2 text-dark">SIM TYPE<span class="text-danger">*</span></label>
-
-                        <select name="sim_status" class="form-select @error('sim_status') is-invalid @enderror" required>
+                        <select name="sim_status" required
+                            class="form-select @error('sim_status') is-invalid @enderror">
                             <option value="">Select SIM Type</option>
-
-                            <option value="Single Physical SIM"
-                                {{ old('sim_status', $stock->sim_status) == 'Single Physical SIM' ? 'selected' : '' }}>
-                                Single Physical SIM
-                            </option>
-
-                            <option value="Dual Physical SIM"
-                                {{ old('sim_status', $stock->sim_status) == 'Dual Physical SIM' ? 'selected' : '' }}>
-                                Dual Physical SIM
-                            </option>
-
-                            <option value="Single eSIM"
-                                {{ old('sim_status', $stock->sim_status) == 'Single eSIM' ? 'selected' : '' }}>
-                                Single eSIM
-                            </option>
-
-                            <option value="Dual eSIM"
-                                {{ old('sim_status', $stock->sim_status) == 'Dual eSIM' ? 'selected' : '' }}>
-                                Dual eSIM
-                            </option>
-
-                            <option value="Physical SIM + eSIM"
-                                {{ old('sim_status', $stock->sim_status) == 'Physical SIM + eSIM' ? 'selected' : '' }}>
-                                Physical SIM + eSIM
-                            </option>
-
+                            @foreach ($simOptions as $option)
+                                <option value="{{ $option }}" {{ $sel('sim_status', $option) }}>{{ $option }}</option>
+                            @endforeach
                         </select>
-
                         @error('sim_status')
                             <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
 
-
-
                     <div class="col-lg-4 col-md-4 col-6">
-                        <label for="" class="fw-bold mb-2 text-dark">PURCHASE PRICE<span
-                                class="text-danger">*</span></label>
-                        <input type="number" min="1" required placeholder="Purchase Price"
-                            value="{{ old('purchase', $stock->purchase) }}"
-                            class="form-control @error('purchase') is-invalid @enderror" name="purchase">
+                        <label class="fw-bold mb-2 text-dark">PURCHASE PRICE<span class="text-danger">*</span></label>
+                        <input type="number" name="purchase" min="1" required placeholder="Purchase Price"
+                            value="{{ $val('purchase') }}"
+                            class="form-control @error('purchase') is-invalid @enderror">
                         @error('purchase')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
 
                     <div class="col-lg-4 col-md-4 col-6">
-                        <label for="" class="fw-bold mb-2 text-dark">SALE PRICE<span
-                                class="text-danger">*</span></label>
-                        <input type="number" min="2" required placeholder="Sale Price"
-                            value="{{ old('sale', $stock->sale) }}"
-                            class="form-control @error('sale') is-invalid @enderror" name="sale">
+                        <label class="fw-bold mb-2 text-dark">SALE PRICE<span class="text-danger">*</span></label>
+                        <input type="number" name="sale" min="2" required placeholder="Sale Price"
+                            value="{{ $val('sale') }}" class="form-control @error('sale') is-invalid @enderror">
                         @error('sale')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
+                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
                     </div>
                 </div>
 
+                {{-- ------------------------------- Actions ------------------------------- --}}
                 <button type="submit" name="action" value="save" class="btn btn-primary mt-3 float-end ms-2"
                     title="Save">
-                    {{ $stock->id != null ? 'Update' : 'Save' }} <i class="bx bx-check-circle"></i>
+                    {{ $isEdit ? 'Update' : 'Save' }} <i class="bx bx-check-circle"></i>
                 </button>
 
-                @if ($stock->id == null)
+                @unless ($isEdit)
                     <button type="submit" name="action" value="save_add_new" class="btn btn-dark mt-3 float-end"
                         title="Save and Add New">
-                        Save & Add New <i class="bx bx-plus-circle"></i>
+                        Save &amp; Add New <i class="bx bx-plus-circle"></i>
                     </button>
-                @endif
-
+                @endunless
             </form>
         </div>
     </div>
 
-
-    <script>
-        $(":input").inputmask();
-    </script>
-
+    {{-- ================================== Styles ================================== --}}
     <style>
+        .custom-back-button {
+            font-size: 16px;
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
+            text-decoration: none;
+            transition: all .3s ease;
+            font-weight: 500;
+        }
+
+        .custom-back-button:hover { background-color: #314861; }
+        .custom-back-button i { font-size: 18px; }
+
+        .color-circle {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border-radius: 50%;
+            border: 2px solid #999;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, .15);
+        }
+
+        #color-preview:not(.d-none) { display: flex; }
+
         .select2-container--default .select2-selection--single {
             display: block;
             width: 100%;
-            padding: 0.300rem 0.200rem 0.300rem 0.200rem;
+            padding: .3rem .2rem;
             font-size: 1rem;
             font-weight: 400;
             line-height: 1.5;
@@ -807,98 +482,217 @@
             background-color: #fff;
             background-clip: padding-box;
             border: 1px solid #ced4da;
-            border-radius: 0.375rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            border-radius: .375rem;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
             height: auto;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             top: 50%;
-            right: 0.32rem;
+            right: .32rem;
             transform: translateY(-50%);
             height: auto;
         }
     </style>
 
+    {{-- ================================== Scripts ================================== --}}
+    {{-- Phone & CNIC masks: standalone plain JS (no jQuery, no plugins). --}}
+    <script>
+        (function () {
+            const PHONE_PREFIX     = '03';
+            const PHONE_MAX_DIGITS = 11;   // 0300-1234567
+            const PHONE_DASH_AT    = 4;
+            const CNIC_MAX_DIGITS  = 13;   // 12345-1234567-1
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            const digitsOnly = (v) => v.replace(/\D/g, '');
+
+            /**
+             * Phone: the "03" prefix is always present and cannot be removed.
+             * Whatever is typed/pasted after it is kept.
+             *   "3001234567"   -> 0300-1234567
+             *   "03001234567"  -> 0300-1234567
+             *   "923001234567" -> 0300-1234567
+             */
+            function formatPhone(value) {
+                let d = digitsOnly(value);
+
+                if (d.startsWith('92')) d = d.substring(2);   // country code
+                if (d.startsWith('0'))  d = d.substring(1);   // leading zero
+                if (d.startsWith('3'))  d = d.substring(1);   // the "3" of "03"
+
+                d = (PHONE_PREFIX + d).substring(0, PHONE_MAX_DIGITS);
+
+                return d.length > PHONE_DASH_AT
+                    ? d.substring(0, PHONE_DASH_AT) + '-' + d.substring(PHONE_DASH_AT)
+                    : d;
+            }
+
+            // CNIC: 12345-1234567-1
+            function formatCnic(value) {
+                const d = digitsOnly(value).substring(0, CNIC_MAX_DIGITS);
+                return [d.substring(0, 5), d.substring(5, 12), d.substring(12)]
+                    .filter(Boolean)
+                    .join('-');
+            }
+
+            const masks = {
+                'phone-field':          formatPhone,
+                'pushasing_from_phone': formatPhone,
+                'cnic-field':           formatCnic,
+                'pushasing_from_cnic':  formatCnic,
+            };
+
+            const getFormatter = (el) => masks[el.id] || masks[el.name];
+            const isPhone      = (el) => el.id === 'phone-field' || el.name === 'pushasing_from_phone';
+
+            const moveCaretToEnd = (el) => {
+                const len = el.value.length;
+                try { el.setSelectionRange(len, len); } catch (e) {}
+            };
+
+            // Live formatting while typing / pasting
+            document.addEventListener('input', function (e) {
+                const format = getFormatter(e.target);
+                if (!format) return;
+                e.target.value = format(e.target.value);
+            });
+
+            // Phone: show the "03" prefix as soon as the field is focused
+            document.addEventListener('focusin', function (e) {
+                if (!isPhone(e.target)) return;
+                if (e.target.value === '') {
+                    e.target.value = PHONE_PREFIX;
+                    // wait a tick so the browser does not reset the caret
+                    setTimeout(() => moveCaretToEnd(e.target), 0);
+                }
+            });
+
+            // Phone: if only the bare prefix was left, clear it again
+            // (so "required" validation and the placeholder work properly)
+            document.addEventListener('focusout', function (e) {
+                if (isPhone(e.target) && e.target.value === PHONE_PREFIX) {
+                    e.target.value = '';
+                }
+            });
+
+            // Format any pre-filled values (edit page / validation errors)
+            function formatExisting() {
+                document.querySelectorAll('#phone-field, #cnic-field, [name="pushasing_from_phone"], [name="pushasing_from_cnic"]')
+                    .forEach(function (el) {
+                        const format = getFormatter(el);
+                        if (format && el.value) el.value = format(el.value);
+                    });
+            }
+
+            // Debug marker: open the console (F12). If you do not see this line,
+            // this view is NOT the one being rendered.
+            console.log('[stock-form] phone/cnic masks loaded v4');
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', formatExisting);
+            } else {
+                formatExisting();
+            }
+        })();
+    </script>
+
+    {{-- Needs jQuery from the master layout; the code below still works without it. --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
     <script>
-        $('#model-select').select2({
-            placeholder: 'Select Model',
-            allowClear: true
-        });
-        $('#company-select').select2({
-            placeholder: 'Select Company',
-            allowClear: true
-        });
-        $('#color-select').select2({
-            placeholder: 'Select Color',
-            allowClear: true
-        });
-        $('#ram-select').select2({
-            placeholder: 'Select Ram',
-            allowClear: true
-        });
-        $('#rom-select').select2({
-            placeholder: 'Select Storage / Rom',
-            allowClear: true
-        });
-    </script>
+        document.addEventListener('DOMContentLoaded', function () {
 
+            const $id = (id) => document.getElementById(id);
 
+            /* -------------------------------------------------------------
+             | 1. Purchasing source: Local (seller info) / Dealer (dealer select)
+             * ------------------------------------------------------------- */
+            const purchasingFrom  = $id('purchasing-from');
+            const sellerSection   = $id('seller-information');
+            const dealerSection   = $id('dealer-information');
+            const dealerSelect    = $id('dealer-select');
+            const sellerRequired  = ['name-field', 'phone-field', 'cnic-field'].map($id);
+            const sellerPatterned = ['phone-field', 'cnic-field'].map($id);
 
+            // Remember each field's pattern so it can be switched off while hidden
+            sellerPatterned.forEach((el) => { el.dataset.pattern = el.getAttribute('pattern'); });
 
+            const setRequired = (el, required) => el.toggleAttribute('required', required);
 
+            function togglePurchasingSource() {
+                const isLocal  = purchasingFrom.value === 'Local';
+                const isDealer = purchasingFrom.value === 'Dealer';
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                sellerSection.style.display = isLocal ? 'block' : 'none';
+                dealerSection.style.display = isDealer ? 'block' : 'none';
 
+                sellerRequired.forEach((el) => setRequired(el, isLocal));
 
+                // Phone/CNIC format is only enforced when the seller section is visible
+                sellerPatterned.forEach((el) => {
+                    if (isLocal) el.setAttribute('pattern', el.dataset.pattern);
+                    else         el.removeAttribute('pattern');
+                });
 
-
-
-    <script>
-        function handlePurchasingFromChange() {
-            var value = document.getElementById('purchasing-from').value;
-            var sellerInfo = document.getElementById('SellerInformation');
-            var dealerInfo = document.getElementById('DealerInformation');
-
-            var nameField = document.getElementById('name-field');
-            var phoneField = document.getElementById('phone-field');
-            var cnicField = document.getElementById('cnic-field');
-            var addressField = document.getElementById('address-field');
-            var DealerSelect = document.getElementById('dealer-select');
-
-            if (value === 'Local') {
-                sellerInfo.style.display = 'block';
-                dealerInfo.style.display = 'none';
-                nameField.setAttribute('required', 'required');
-                phoneField.setAttribute('required', 'required');
-                cnicField.setAttribute('required', 'required');
-                // addressField.setAttribute('required', 'required');
-                DealerSelect.removeAttribute('required');
-            } else if (value === 'Dealer') {
-                sellerInfo.style.display = 'none';
-                dealerInfo.style.display = 'block';
-                nameField.removeAttribute('required');
-                phoneField.removeAttribute('required');
-                cnicField.removeAttribute('required');
-                addressField.removeAttribute('required');
-                DealerSelect.setAttribute('required', 'required');
-            } else {
-                sellerInfo.style.display = 'none';
-                dealerInfo.style.display = 'none';
-                nameField.removeAttribute('required');
-                phoneField.removeAttribute('required');
-                cnicField.removeAttribute('required');
-                addressField.removeAttribute('required');
-                DealerSelect.removeAttribute('required');
+                setRequired(dealerSelect, isDealer);
             }
-        }
-        document.getElementById('purchasing-from').addEventListener('change', handlePurchasingFromChange);
-        document.addEventListener('DOMContentLoaded', function() {
-            handlePurchasingFromChange();
+
+            purchasingFrom.addEventListener('change', togglePurchasingSource);
+            togglePurchasingSource();
+
+            /* -------------------------------------------------------------
+             | 2. iPhone colour preview (Apple only)
+             * ------------------------------------------------------------- */
+            @if ($isApple)
+                const colorMap     = @json($iphoneColors);
+                const colorSelect  = $id('color-select');
+                const colorPreview = $id('color-preview');
+                const colorCircle  = $id('color-circle');
+                const colorName    = $id('color-name');
+
+                const isLight = (hex) => {
+                    const n = parseInt(hex.slice(1), 16);
+                    const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+                    return (0.299 * r + 0.587 * g + 0.114 * b) > 200;
+                };
+
+                function updateColorPreview() {
+                    const color = colorSelect.value;
+                    const hex   = colorMap[color];
+
+                    colorPreview.classList.toggle('d-none', !hex);
+                    if (!hex) return;
+
+                    colorCircle.style.backgroundColor = hex;
+                    colorCircle.style.borderColor     = isLight(hex) ? '#999999' : '#cccccc';
+                    colorName.textContent             = color;
+                }
+
+                colorSelect.addEventListener('change', updateColorPreview);
+                updateColorPreview();
+            @endif
+
+            /* -------------------------------------------------------------
+             | 3. Select2 (last, and guarded, so a missing plugin can never
+             |    break the code above)
+             * ------------------------------------------------------------- */
+            if (window.jQuery && jQuery.fn.select2) {
+                [
+                    ['#model-select',   'Select Model'],
+                    ['#company-select', 'Select Company'],
+                    ['#color-select',   'Select Color'],
+                    ['#ram-select',     'Select Ram'],
+                    ['#rom-select',     'Select Storage / Rom'],
+                ].forEach(([selector, placeholder]) => {
+                    jQuery(selector).select2({ placeholder, allowClear: true });
+                });
+
+                // Select2 fires jQuery events - forward to the colour preview.
+                @if ($isApple)
+                    jQuery('#color-select').on('change', updateColorPreview);
+                @endif
+            } else {
+                console.warn('Select2 / jQuery not found - using plain selects.');
+            }
         });
     </script>
-
 @endsection
