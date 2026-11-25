@@ -133,7 +133,8 @@
                         $pta = $stock->pta_status;
                         $ptaClass = $pta == 'Official Approved' ? 'ok' : ($pta == 'Not Approved' ? 'bad' : 'mid');
                         $health = $stock->health;
-                        $healthText = $health !== null && $health !== '' ? (is_numeric($health) ? $health . '%' : $health) : '—';
+                        $healthText =
+                            $health !== null && $health !== '' ? (is_numeric($health) ? $health . '%' : $health) : '—';
                         $companyLabel = $stock->company_name ?: ($isApple ? 'Apple' : null);
 
                         $from = strtolower(trim($stock->purchasing_from ?? ''));
@@ -143,7 +144,8 @@
                             $fromLabel = 'DEALER' . ($stock->dealer_name ? ' - ' . $stock->dealer_name : '');
                         } elseif ($from === 'local') {
                             $fromIcon = 'bx-user';
-                            $fromLabel = 'LOCAL' . ($stock->pushasing_from_name ? ' - ' . $stock->pushasing_from_name : '');
+                            $fromLabel =
+                                'LOCAL' . ($stock->pushasing_from_name ? ' - ' . $stock->pushasing_from_name : '');
                         } elseif ($from !== '') {
                             $fromLabel = $stock->purchasing_from;
                         }
@@ -163,14 +165,14 @@
                                 <span class="pta {{ $ptaClass }}"><i></i>{{ $pta }}</span>
                                 <span class="tag-available"><i></i>Available</span>
                                 @if ($fromLabel)
-                                    <span class="from-tag"><i class="bx {{ $fromIcon }}"></i>{{ $fromLabel }}</span>
+                                    <span class="from-tag"><i
+                                            class="bx {{ $fromIcon }}"></i>{{ $fromLabel }}</span>
                                 @endif
                                 <span class="item-date"><i class="bx bx-calendar"></i>
                                     {{ $stock->created_at->format('d M Y') }}</span>
                             </div>
 
-                            <a href="{{ route('stock.view', ['id' => $stock->id]) }}"
-                                class="item-model"
+                            <a href="{{ route('stock.view', ['id' => $stock->id]) }}" class="item-model"
                                 title="View Details">
                                 {{ $stock->model_name }}{{ $stock->color ? ' - ' . $stock->color : '' }}
                             </a>
@@ -178,13 +180,15 @@
                             <div class="specs">
                                 <div class="sp"><small>Storage</small><b>{{ $stock->rom ?: '—' }}</b></div>
                                 @if ($isApple)
-                                    <div class="sp"><small>Battery Health</small><b>{{ $healthText }}</b></div>
+                                    <div class="sp"><small>B-Health</small><b>{{ $healthText }}</b></div>
                                 @else
                                     <div class="sp"><small>RAM</small><b>{{ $stock->ram ?: '—' }}</b></div>
                                 @endif
                                 <div class="sp"><small>Sim Type</small><b>{{ $stock->sim_status ?: '—' }}</b></div>
-                                <div class="sp"><small>Activation Status</small><b>{{ $stock->activation_status ?: '—' }}</b></div>
-                                <div class="sp"><small>Country Lock Status</small><b>{{ $stock->country_status ?: '—' }}</b></div>
+                                <div class="sp"><small>Activation
+                                        Status</small><b>{{ $stock->activation_status ?: '—' }}</b></div>
+                                <div class="sp"><small>Country Lock
+                                        Status</small><b>{{ $stock->country_status ?: '—' }}</b></div>
                             </div>
 
                             <div class="imeis">
@@ -215,7 +219,8 @@
                                 href="{{ route('stock.edit', ['type' => request()->type, 'id' => $stock->id]) }}"
                                 title="Edit Stock">
                                 <small>Sale price</small>
-                                <b>Rs. <span data-count="{{ (int) $stock->sale }}">{{ number_format($stock->sale) }}</span></b>
+                                <b>Rs. <span
+                                        data-count="{{ (int) $stock->sale }}">{{ number_format($stock->sale) }}</span></b>
                             </a>
 
                             <button type="button" class="purchase-toggle" onclick="togglePurchase(this)"
@@ -241,6 +246,43 @@
                                 title="Edit">
                                 <i class="bx bx-edit-alt"></i>
                             </a>
+
+                            <a class="btn btn-outline-dark btn-icon fx-ripple js-delete-stock"
+                                href="{{ route('stock.delete', ['id' => $stock->id]) }}" title="Delete">
+                                <i class="bx bx-trash-alt"></i>
+                            </a>
+
+
+
+                            {{-- Skip this line if SweetAlert2 is already loaded in your layout --}}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                            <script>
+                                document.addEventListener('click', function(e) {
+                                    const btn = e.target.closest('.js-delete-stock');
+                                    if (!btn) return;
+
+                                    e.preventDefault();
+                                    const url = btn.getAttribute('href');
+
+                                    Swal.fire({
+                                        title: 'Delete this stock item?',
+                                        text: "This action can't be undone.",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Yes, delete it',
+                                        cancelButtonText: 'Cancel',
+                                        confirmButtonColor: '#d33',
+                                        cancelButtonColor: '#6c757d',
+                                        reverseButtons: true,
+                                        focusCancel: true
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = url;
+                                        }
+                                    });
+                                });
+                            </script>
                         </div>
                     </article>
                 @endforeach
@@ -328,8 +370,8 @@
                                     <label class="fw-bold text-dark mb-1">Buyer Phone (optional)</label>
                                     <input type="text" maxlength="12" inputmode="numeric" autocomplete="off"
                                         placeholder="0300-1234567"
-                                        class="form-control @error('buyer_phone') is-invalid @enderror"
-                                        name="buyer_phone" id="buyerPhone">
+                                        class="form-control @error('buyer_phone') is-invalid @enderror" name="buyer_phone"
+                                        id="buyerPhone">
                                     @error('buyer_phone')
                                         <span class="invalid-feedback"
                                             role="alert"><strong>{{ $message }}</strong></span>
@@ -1371,11 +1413,14 @@
             if (!stack) return;
             const t = document.createElement('div');
             t.className = 'toast-pop' + (isError ? ' err' : '');
-            t.innerHTML = '<i class="bx ' + (isError ? 'bx-error-circle' : 'bx-check-circle') + '"></i><span>' + html + '</span>';
+            t.innerHTML = '<i class="bx ' + (isError ? 'bx-error-circle' : 'bx-check-circle') + '"></i><span>' + html +
+                '</span>';
             stack.appendChild(t);
             setTimeout(function() {
                 t.classList.add('out');
-                setTimeout(function() { t.remove(); }, 380);
+                setTimeout(function() {
+                    t.remove();
+                }, 380);
             }, 2200);
         }
 
@@ -1423,7 +1468,8 @@
             if (chip) handleCopy(chip);
         });
         document.addEventListener('keydown', function(e) {
-            if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('imei-chip')) {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains(
+                    'imei-chip')) {
                 e.preventDefault();
                 handleCopy(e.target);
             }
@@ -1441,28 +1487,30 @@
             w.style.left = (e.clientX - r.left - size / 2) + 'px';
             w.style.top = (e.clientY - r.top - size / 2) + 'px';
             btn.appendChild(w);
-            setTimeout(function() { w.remove(); }, 650);
+            setTimeout(function() {
+                w.remove();
+            }, 650);
         });
 
         /* ---------- buyer phone: always starts with 03 -> 03XX-XXXXXXX (plain JS, no plugins) ---------- */
-        const BUYER_PHONE_PREFIX     = '03';
-        const BUYER_PHONE_MAX_DIGITS = 11;   // 0300-1234567
-        const BUYER_PHONE_DASH_AT    = 4;
+        const BUYER_PHONE_PREFIX = '03';
+        const BUYER_PHONE_MAX_DIGITS = 11; // 0300-1234567
+        const BUYER_PHONE_DASH_AT = 4;
 
         const buyerPhoneField = document.getElementById('buyerPhone');
 
         function formatBuyerPhone(value) {
             let d = value.replace(/\D/g, '');
 
-            if (d.startsWith('92')) d = d.substring(2);   // country code
-            if (d.startsWith('0'))  d = d.substring(1);   // leading zero
-            if (d.startsWith('3'))  d = d.substring(1);   // the "3" of "03"
+            if (d.startsWith('92')) d = d.substring(2); // country code
+            if (d.startsWith('0')) d = d.substring(1); // leading zero
+            if (d.startsWith('3')) d = d.substring(1); // the "3" of "03"
 
             d = (BUYER_PHONE_PREFIX + d).substring(0, BUYER_PHONE_MAX_DIGITS);
 
-            return d.length > BUYER_PHONE_DASH_AT
-                ? d.substring(0, BUYER_PHONE_DASH_AT) + '-' + d.substring(BUYER_PHONE_DASH_AT)
-                : d;
+            return d.length > BUYER_PHONE_DASH_AT ?
+                d.substring(0, BUYER_PHONE_DASH_AT) + '-' + d.substring(BUYER_PHONE_DASH_AT) :
+                d;
         }
 
         // Enforce the full format only while the buyer fields are visible,
@@ -1487,7 +1535,9 @@
                 buyerPhoneField.value = BUYER_PHONE_PREFIX;
                 setTimeout(function() {
                     const len = buyerPhoneField.value.length;
-                    try { buyerPhoneField.setSelectionRange(len, len); } catch (e) {}
+                    try {
+                        buyerPhoneField.setSelectionRange(len, len);
+                    } catch (e) {}
                 }, 0);
             }
         });
@@ -1570,7 +1620,9 @@
             const sw = document.getElementById('purchaseSwitch');
             const all = document.querySelectorAll('.purchase-toggle');
             if (!sw || !all.length) return;
-            sw.checked = [...all].every(function(b) { return b.classList.contains('open'); });
+            sw.checked = [...all].every(function(b) {
+                return b.classList.contains('open');
+            });
         }
 
         function togglePurchase(btn) {
@@ -1585,6 +1637,7 @@
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             const dur = 900;
             const start = performance.now();
+
             function tick(now) {
                 const p = Math.min((now - start) / dur, 1);
                 const eased = 1 - Math.pow(1 - p, 3);
@@ -1604,12 +1657,20 @@
             const all = document.querySelectorAll('.purchase-toggle');
             if (sw) {
                 let on = false;
-                try { on = localStorage.getItem('showPurchasePrice') === 'true'; } catch (e) {}
+                try {
+                    on = localStorage.getItem('showPurchasePrice') === 'true';
+                } catch (e) {}
                 sw.checked = on && all.length > 0;
-                all.forEach(function(b) { setToggle(b, on); });
+                all.forEach(function(b) {
+                    setToggle(b, on);
+                });
                 sw.addEventListener('change', function() {
-                    all.forEach(function(b) { setToggle(b, sw.checked); });
-                    try { localStorage.setItem('showPurchasePrice', sw.checked); } catch (e) {}
+                    all.forEach(function(b) {
+                        setToggle(b, sw.checked);
+                    });
+                    try {
+                        localStorage.setItem('showPurchasePrice', sw.checked);
+                    } catch (e) {}
                 });
             }
 
@@ -1621,7 +1682,9 @@
             const reveal = function(el) {
                 el.classList.add('in');
                 el.querySelectorAll('.sale [data-count]').forEach(countUp);
-                setTimeout(function() { el.classList.add('settled'); }, 1200);
+                setTimeout(function() {
+                    el.classList.add('settled');
+                }, 1200);
             };
             if ('IntersectionObserver' in window) {
                 const io = new IntersectionObserver(function(entries) {
@@ -1631,8 +1694,12 @@
                             io.unobserve(en.target);
                         }
                     });
-                }, { threshold: 0.08 });
-                items.forEach(function(el) { io.observe(el); });
+                }, {
+                    threshold: 0.08
+                });
+                items.forEach(function(el) {
+                    io.observe(el);
+                });
             } else {
                 items.forEach(reveal);
             }
@@ -1658,8 +1725,14 @@
             function initPlugins() {
                 const $ = window.jQuery;
                 if (!$ || !$.fn.select2) return;
-                $('#model-select').select2({ placeholder: 'Select Model', allowClear: true });
-                $('#company-select').select2({ placeholder: 'Select Company', allowClear: true });
+                $('#model-select').select2({
+                    placeholder: 'Select Model',
+                    allowClear: true
+                });
+                $('#company-select').select2({
+                    placeholder: 'Select Company',
+                    allowClear: true
+                });
             }
 
             function withSelect2() {
@@ -1669,7 +1742,8 @@
 
             document.addEventListener('DOMContentLoaded', function() {
                 if (window.jQuery) withSelect2();
-                else loadScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js', withSelect2);
+                else loadScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js',
+                    withSelect2);
             });
         })();
     </script>

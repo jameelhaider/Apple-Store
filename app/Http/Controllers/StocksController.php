@@ -319,18 +319,18 @@ public function index(Request $request, $type)
 
 
 
-    // public function delete($id)
-    // {
-    //     if (Gate::allows('is_admin')) {
-    //         $stock = Stocks::find($id);
-    //         if (!is_null($stock)) {
-    //             $stock->delete();
-    //         }
-    //         return redirect()->back()->with('success', 'Stock Deleted Successfully');
-    //     } else {
-    //         return abort(401);
-    //     }
-    // }
+    public function delete($id)
+    {
+        if (Gate::allows('is_admin')) {
+            $stock = Stocks::find($id);
+            if (!is_null($stock)) {
+                $stock->delete();
+            }
+            return redirect()->back()->with('success', 'Stock Deleted Successfully');
+        } else {
+            return abort(401);
+        }
+    }
 
 
     public function markassold(Request $request)

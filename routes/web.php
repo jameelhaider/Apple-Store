@@ -272,7 +272,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/edit/{type}/{id}', [StocksController::class, 'edit'])->name("stock.edit");
             Route::get('/view/{id}', [StocksController::class, 'view'])->name("stock.view");
             Route::post('/update/{id}', [StocksController::class, 'update'])->name("update.stock");
-            // Route::get('/delete/{id}', [StocksController::class, 'delete'])->name("stock.delete");
+            Route::get('/delete/{id}', [StocksController::class, 'delete'])->name("stock.delete");
             Route::get('/{type}', [StocksController::class, 'index'])->name("stock.index");
             // view
             Route::get('/{id}/view', [StocksController::class, 'view'])->name("stock.view");
